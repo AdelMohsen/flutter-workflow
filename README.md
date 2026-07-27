@@ -36,7 +36,7 @@ need its own `pubspec.yaml`.
 Clone it once anywhere on your machine:
 
 ```bash
-git clone https://github.com/<owner>/flutter-codex-workflow.git
+git clone https://github.com/AdelMohsen/flutter-workflow.git
 ```
 
 ### 2. Install it into a Flutter project
