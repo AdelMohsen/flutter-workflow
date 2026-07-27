@@ -9,8 +9,10 @@ Fix the proven cause, not the reported symptom.
 
 ## Run the flow
 
-1. Announce Flutter Workflow `1.0.0` and `CHAT_NATIVE` execution. Do not execute
-   the chat token or start another coding agent.
+1. Render the standard startup banner from
+   `.flutter-workflow/workflow.json` with flow `Bug Fix` and the current
+   workspace name. Render it once. Do not execute the chat token or start
+   another coding agent.
 2. Read `FLUTTER-WORKFLOW.md`, constitution/profile, repository guidance, and
    the complete affected feature. Require completed initialization.
 3. Collect the feature, observed behavior, expected behavior, minimal

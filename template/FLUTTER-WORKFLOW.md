@@ -1,11 +1,12 @@
 # Flutter Codex Workflow
 
-Version: `1.0.0`
-
 This file is the canonical entrypoint for project-local Flutter delivery flows.
 The workflow is Codex-only and chat-native. Messages such as
 `flutter flow:new` are activation tokens; do not execute them in a shell and do
 not start a nested coding agent.
+
+Workflow identity and release metadata live only in
+`.flutter-workflow/workflow.json`.
 
 ## Flow mapping
 
@@ -15,17 +16,41 @@ not start a nested coding agent.
 | `flutter flow:new` | `$flutter-new-feature` |
 | `flutter flow:change` | `$flutter-change-feature` |
 | `flutter flow:bug` | `$flutter-fix-bug` |
+| `flutter component:add` | `$flutter-add-component` |
+
+## Startup banner
+
+At the start of every flow, read `.flutter-workflow/workflow.json` and render
+this banner once. Substitute the selected flow and current project directory
+name. Keep the creator credit as a secondary footer outside the box.
+
+```text
+╭────────────────────────────────────────────────╮
+│ {organization_label}                           │
+│ {name} · v{version}                            │
+│ Automation: {automation}                       │
+╰────────────────────────────────────────────────╯
+
+Flow        {flow}
+Workspace   {workspace}
+
+created by {creator}
+```
+
+Pad banner values to preserve the frame. Values come from the identity file;
+never replace them with duplicated skill-local metadata.
 
 ## Read order
 
 For every flow:
 
-1. Read this file completely.
-2. Read `.flutter-workflow/constitution.md` and
+1. Read `.flutter-workflow/workflow.json` and this file completely.
+2. Render the startup banner once.
+3. Read `.flutter-workflow/constitution.md` and
    `.flutter-workflow/project-profile.md` when they exist.
-3. Read the selected skill completely.
-4. Read repository guidance such as `AGENTS.md`, `rules.md`, or equivalent.
-5. Inspect the relevant code, dependencies, shared widgets, and generated-code
+4. Read the selected skill completely.
+5. Read repository guidance such as `AGENTS.md`, `rules.md`, or equivalent.
+6. Inspect the relevant code, dependencies, shared widgets, and generated-code
    conventions before asking discoverable questions.
 
 If initialization has not completed, delivery flows stop and ask the developer
@@ -95,7 +120,7 @@ approval again.
 
 ## Work items
 
-Store each `new`, `change`, or `bug` flow under:
+Store each `new`, `change`, `bug`, or `component` flow under:
 
 ```text
 .flutter-workflow/work-items/FW-NNNN-slug/

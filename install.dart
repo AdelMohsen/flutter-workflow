@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
 
-const workflowName = 'flutter-codex-workflow';
-const workflowVersion = '1.0.0';
-
 const managedPaths = <String>[
   'FLUTTER-WORKFLOW.md',
+  '.flutter-workflow/workflow.json',
+  '.flutter-workflow/component-packs',
   '.agents/skills/flutter-project-init',
   '.agents/skills/flutter-new-feature',
   '.agents/skills/flutter-change-feature',
   '.agents/skills/flutter-fix-bug',
+  '.agents/skills/flutter-add-component',
 ];
 
 void main(List<String> args) {
@@ -34,9 +34,11 @@ void main(List<String> args) {
 
   try {
     _validateSource(templateRoot);
+    final identity = _readWorkflowIdentity(templateRoot);
     _validateFlutterProject(targetRoot);
-    _install(templateRoot, targetRoot);
-    stdout.writeln('Flutter Codex Workflow $workflowVersion installed.');
+    _install(templateRoot, targetRoot, identity);
+    _printBanner(identity, 'Installation', _workspaceName(targetRoot));
+    stdout.writeln('Workflow installed successfully.');
     stdout.writeln('Target: ${targetRoot.path}');
     stdout.writeln(
       'Next: open the project in Codex and send "flutter workflow:init".',
@@ -52,6 +54,61 @@ void main(List<String> args) {
     stderr.writeln('Installation failed: $error');
     exitCode = 1;
   }
+}
+
+Map<String, String> _readWorkflowIdentity(Directory templateRoot) {
+  final file = File(
+    '${templateRoot.path}${Platform.pathSeparator}.flutter-workflow'
+    '${Platform.pathSeparator}workflow.json',
+  );
+  final decoded = jsonDecode(file.readAsStringSync());
+  if (decoded is! Map) {
+    throw const FormatException('workflow.json must contain an object.');
+  }
+
+  const keys = <String>[
+    'schema_version',
+    'organization',
+    'organization_label',
+    'name',
+    'version',
+    'creator',
+    'automation',
+  ];
+  final identity = <String, String>{};
+  for (final key in keys) {
+    final value = decoded[key];
+    if (value is! String || value.trim().isEmpty) {
+      throw FormatException('workflow.json has an invalid "$key" value.');
+    }
+    identity[key] = value.trim();
+  }
+  return identity;
+}
+
+void _printBanner(Map<String, String> identity, String flow, String workspace) {
+  const contentWidth = 48;
+  final border = List.filled(contentWidth, '─').join();
+  String line(String value) => '│${' $value'.padRight(contentWidth)}│';
+
+  stdout.writeln('╭$border╮');
+  stdout.writeln(line(identity['organization_label']!));
+  stdout.writeln(line('${identity['name']} · v${identity['version']}'));
+  stdout.writeln(line('Automation: ${identity['automation']}'));
+  stdout.writeln('╰$border╯');
+  stdout.writeln();
+  stdout.writeln('Flow        $flow');
+  stdout.writeln('Workspace   $workspace');
+  stdout.writeln();
+  stdout.writeln('created by ${identity['creator']}');
+  stdout.writeln();
+}
+
+String _workspaceName(Directory targetRoot) {
+  final segments = targetRoot.uri.pathSegments
+      .where((segment) => segment.isNotEmpty)
+      .toList();
+  return segments.isEmpty ? targetRoot.path : segments.last;
 }
 
 String? _readOption(List<String> args, String name) {
@@ -119,7 +176,11 @@ void _validateFlutterProject(Directory targetRoot) {
   }
 }
 
-void _install(Directory templateRoot, Directory targetRoot) {
+void _install(
+  Directory templateRoot,
+  Directory targetRoot,
+  Map<String, String> identity,
+) {
   final workflowDirectory = Directory(
     '${targetRoot.path}${Platform.pathSeparator}.flutter-workflow',
   )..createSync(recursive: true);
@@ -149,7 +210,7 @@ void _install(Directory templateRoot, Directory targetRoot) {
       _copyEntity(source, destination);
     }
 
-    _writeInstallationMetadata(workflowDirectory);
+    _writeInstallationMetadata(workflowDirectory, identity);
     backupRoot.deleteSync(recursive: true);
   } catch (_) {
     for (final relativePath in managedPaths.reversed) {
@@ -168,7 +229,10 @@ void _install(Directory templateRoot, Directory targetRoot) {
   }
 }
 
-void _writeInstallationMetadata(Directory workflowDirectory) {
+void _writeInstallationMetadata(
+  Directory workflowDirectory,
+  Map<String, String> identity,
+) {
   final metadataFile = File(
     '${workflowDirectory.path}${Platform.pathSeparator}installation.json',
   );
@@ -188,8 +252,10 @@ void _writeInstallationMetadata(Directory workflowDirectory) {
 
   final metadata = <String, Object>{
     'schema_version': '1.0',
-    'workflow': workflowName,
-    'version': workflowVersion,
+    'workflow': identity['name']!,
+    'version': identity['version']!,
+    'organization': identity['organization']!,
+    'creator': identity['creator']!,
     'installed_at': installedAt,
     'updated_at': now,
     'managed_paths': managedPaths,

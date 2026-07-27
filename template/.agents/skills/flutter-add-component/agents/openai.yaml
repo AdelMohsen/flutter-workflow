@@ -1,0 +1,4 @@
+interface:
+  display_name: "Flutter Add Component"
+  short_description: "Configure and add a reusable Flutter feature pack"
+  default_prompt: "Use $flutter-add-component to configure, plan, and add a reusable Flutter feature pack."

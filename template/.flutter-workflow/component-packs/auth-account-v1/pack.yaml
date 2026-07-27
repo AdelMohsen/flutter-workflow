@@ -1,0 +1,22 @@
+schema_version: "1.0"
+id: "auth-account-v1"
+name: "Authentication & Account Management"
+version: "1.0.0"
+type: "feature"
+status: "available"
+organization: "INNOVA DIGITS"
+creator: "Adel Mohsen"
+languages:
+  - "ar"
+  - "en"
+architecture: "Widget -> Cubit -> Repository -> Network"
+conflict_policy: "refuse"
+target_paths:
+  - "lib/features/auth"
+  - "lib/features/account_management"
+references:
+  - "discovery.md"
+  - "questions.md"
+  - "architecture.md"
+  - "implementation.md"
+  - "acceptance.md"

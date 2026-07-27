@@ -9,8 +9,10 @@ Initialize workflow knowledge without changing production code.
 
 ## Run the flow
 
-1. Announce Flutter Workflow `1.0.0`, `CHAT_NATIVE` execution, and the current
-   project root. Treat a chat command as intent; do not execute it in a shell.
+1. Render the standard startup banner from
+   `.flutter-workflow/workflow.json` with flow `Project Initialization` and the
+   current workspace name. Render it once. Treat a chat command as intent; do
+   not execute it in a shell or start another coding agent.
 2. Read `FLUTTER-WORKFLOW.md`, repository guidance, `pubspec.yaml`, and existing
    workflow files completely.
 3. Verify `pubspec.yaml` declares Flutter and `lib/` exists. Stop only when the

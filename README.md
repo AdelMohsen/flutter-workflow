@@ -6,6 +6,16 @@ It gives Codex a repeatable process for understanding a project, planning work,
 waiting for explicit approval, implementing the approved scope, and recording
 the result.
 
+```text
+╭────────────────────────────────────────────────╮
+│ INNOVA DIGITS ENGINEERING                      │
+│ Flutter Delivery Workflow · v1.0.0             │
+│ Automation: OpenAI Codex                       │
+╰────────────────────────────────────────────────╯
+
+created by Adel Mohsen
+```
+
 ## What V1 provides
 
 | Chat command | Purpose |
@@ -14,10 +24,10 @@ the result.
 | `flutter flow:new` | Clarify, plan, and build a new Flutter feature |
 | `flutter flow:change` | Safely change an existing feature |
 | `flutter flow:bug` | Reproduce, trace, and fix a defect at its root cause |
+| `flutter component:add` | Configure and add a reusable Feature Pack |
 
 V1 is intentionally small. It does not create Flutter projects, use Spec Kit,
-run a whole-project audit, generate auth-specific recipes, or require
-unit/widget tests.
+run a whole-project audit, or require unit/widget tests.
 
 ## Requirements
 
@@ -68,9 +78,13 @@ flutter-project/
 │       ├── flutter-project-init/
 │       ├── flutter-new-feature/
 │       ├── flutter-change-feature/
-│       └── flutter-fix-bug/
+│       ├── flutter-fix-bug/
+│       └── flutter-add-component/
 └── .flutter-workflow/
+    ├── workflow.json
     ├── installation.json
+    ├── component-packs/
+    │   └── auth-account-v1/
     └── work-items/
 ```
 
@@ -191,9 +205,64 @@ prove the root cause.
 If the evidence is insufficient, the flow stops with `NEEDS_EVIDENCE`. It does
 not guess a fix.
 
+## Add a reusable Feature Pack
+
+Send:
+
+```text
+flutter component:add
+```
+
+Or invoke the skill directly:
+
+```text
+$flutter-add-component
+```
+
+Codex lists the installed Pack catalog. V1 provides:
+
+```text
+1. Authentication & Account Management · v1.0.0
+```
+
+The Pack inspects the current project before configuration and adapts to its
+network, errors, session/cache, navigation, localization, theme, validators,
+shared widgets, and code-generation conventions. It is a set of agent
+Blueprints, not fixed Dart source copied across incompatible projects.
+
+The full Pack supports:
+
+- Email or Phone with Password or OTP;
+- Login, Registration, Verification, Forgot/Reset/Change Password, and Logout;
+- Profile, Update Profile, Change Identifier, Terms, and Delete Account;
+- standard and custom fields, Guest Mode, and post-registration behavior;
+- UI + Logic or Logic Only;
+- Arabic/English and RTL/LTR.
+
+Codex asks one question at a time and shows the current count:
+
+```text
+Authentication & Account Management
+Question 3 of 8 · 5 questions remaining
+```
+
+Conditional answers recalculate the remaining questions. Custom fields use a
+separate step counter while preserving the core count.
+
+Generated Pack code follows:
+
+```text
+Widget → Cubit → Repository → Network
+```
+
+If `lib/features/auth` or `lib/features/account_management` already exists, the
+Pack records the conflict and stops without merging, overwriting, renaming, or
+partially generating files. Other architecture differences are recorded and
+handled as approved prerequisites rather than blockers.
+
 ## Approval flow
 
-Every `new`, `change`, and `bug` flow uses two explicit gates:
+Every `new`, `change`, `bug`, and `component` flow uses two explicit gates:
 
 1. **Playback approval** — confirms behavior, edge cases, UI states, reuse,
    affected layers, packages, platforms, and verification.
@@ -270,4 +339,5 @@ checks reinstallation preservation, and removes its fixtures when finished.
 - No production credentials or unsanitized secrets in workflow inputs
 - No new dependency hidden outside the approved playback and plan
 - No architecture migration hidden inside a feature change or bug fix
+- No merge or overwrite of conflicting Feature Pack target directories
 - No unit/widget test requirement in V1
