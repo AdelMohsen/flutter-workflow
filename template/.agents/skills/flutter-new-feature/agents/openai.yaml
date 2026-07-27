@@ -1,0 +1,4 @@
+interface:
+  display_name: "Flutter New Feature"
+  short_description: "Plan and build a new Flutter BLoC feature"
+  default_prompt: "Use $flutter-new-feature to clarify, plan, implement, and verify a new Flutter feature."
