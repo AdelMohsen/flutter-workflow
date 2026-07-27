@@ -31,18 +31,30 @@ need its own `pubspec.yaml`.
 
 ## Install
 
-### 1. Clone the workflow repository
+### Install from inside the Flutter project
 
-Clone it once anywhere on your machine:
+On macOS, Linux, WSL, or Git Bash, open the Flutter project directory and run:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/AdelMohsen/flutter-workflow/main/install.sh | bash
+```
+
+The current directory is used as the target. The script downloads the latest
+workflow into a temporary directory, runs the Dart installer, and removes the
+temporary clone.
+
+### Install from a local clone
+
+Clone the workflow repository:
 
 ```bash
 git clone https://github.com/AdelMohsen/flutter-workflow.git
 ```
 
-### 2. Install it into a Flutter project
+Then install it into a Flutter project:
 
 ```bash
-dart run flutter-codex-workflow/install.dart \
+dart run flutter-workflow/install.dart \
   --target /absolute/path/to/flutter-project
 ```
 
@@ -222,7 +234,7 @@ V1 does not generate or require unit tests or widget tests.
 Update the local workflow clone:
 
 ```bash
-cd flutter-codex-workflow
+cd flutter-workflow
 git pull
 ```
 
