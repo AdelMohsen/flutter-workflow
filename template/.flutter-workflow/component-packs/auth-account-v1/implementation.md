@@ -2,9 +2,9 @@
 
 1. Require completed workflow initialization.
 2. Read every file listed by `pack.yaml`.
-3. Create the next `FW-NNNN-auth-account` work item with type `component`,
-   source skill `flutter-add-component`, `pack_id: auth-account-v1`, and state
-   `DISCOVERY`.
+3. Create the next `FW-NNNN-auth-account` Work Item with all four required
+   artifact files, type `component`, source skill `flutter-add-component`,
+   `pack_id: auth-account-v1`, and state `DISCOVERY`.
 4. Run discovery and conflict preflight. Stop `BLOCKED` on target conflicts.
 5. Ask the configuration questions with the required progress counters.
 6. Save the configuration review and combined Playback in `spec.md` using the

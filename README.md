@@ -89,6 +89,7 @@ flutter-project/
     ├── installation.json
     ├── output-templates.md
     ├── component-packs/
+    │   ├── project-foundation-v1/
     │   └── auth-account-v1/
     └── work-items/
 ```
@@ -227,13 +228,50 @@ $flutter-add-component
 Codex lists the installed Pack catalog. V1 provides:
 
 ```text
-1. Authentication & Account Management · v1.0.0
+1. Project Foundation & UI Kit · v1.0.0
+2. Authentication & Account Management · v1.0.0
 ```
 
-The Pack inspects the current project before configuration and adapts to its
+### Project Foundation & UI Kit
+
+Run this Pack after `flutter create` on a clean project. It refuses safely when
+`lib/app`, `lib/core`, alternate entrypoints, or additional Dart files already
+exist under `lib/`.
+
+It asks seven questions for:
+
+- App Display Name, bundle/application ID, and Dart package name;
+- one of four fixed primary/secondary color palettes;
+- Arabic or English as the default locale, while generating both with RTL/LTR;
+- `API_BASE_URL` or `Configure Later`;
+- Component Showcase or an Empty App Shell.
+
+The Pack configures only detected platforms and creates a Material 3 app shell,
+routing, DI, networking, errors/results, storage, validators, localization,
+light/dark themes, and reusable form/layout/feedback widgets.
+
+Its fixed approved stack is:
+
+```text
+flutter_bloc
+dio
+get_it
+go_router
+shared_preferences
+flutter_localizations
+intl
+```
+
+Component Showcase uses local demo data and performs no network request. The
+Pack does not create platforms, copy secrets, modify signing, or add Firebase,
+flavors, notifications, analytics, icons, or splash generation.
+
+### Authentication & Account Management
+
+This Pack inspects the current project before configuration and adapts to its
 network, errors, session/cache, navigation, localization, theme, validators,
-shared widgets, and code-generation conventions. It is a set of agent
-Blueprints, not fixed Dart source copied across incompatible projects.
+shared widgets, and code-generation conventions. Packs are agent Blueprints,
+not fixed Dart source copied across incompatible projects.
 
 The full Pack supports:
 

@@ -77,6 +77,8 @@ developer to send `flutter workflow:init`. Project initialization and
 - Prefer, in order: an existing project capability, Flutter/Dart native
   capability, the smallest feature-owned implementation, then a new package.
 - Declare every new or updated direct dependency in the playback and plan.
+- Apply the selected Component Pack's declared conflict and project policies;
+  do not generalize one Pack's target rules to another Pack.
 - Do not create or require unit tests or widget tests in V1.
 
 ## Architecture contract

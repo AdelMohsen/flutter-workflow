@@ -37,6 +37,12 @@ void main() {
       '.flutter-workflow/output-templates.md',
       '.flutter-workflow/component-packs/auth-account-v1/pack.yaml',
       '.flutter-workflow/component-packs/auth-account-v1/questions.md',
+      '.flutter-workflow/component-packs/project-foundation-v1/pack.yaml',
+      '.flutter-workflow/component-packs/project-foundation-v1/discovery.md',
+      '.flutter-workflow/component-packs/project-foundation-v1/questions.md',
+      '.flutter-workflow/component-packs/project-foundation-v1/architecture.md',
+      '.flutter-workflow/component-packs/project-foundation-v1/implementation.md',
+      '.flutter-workflow/component-packs/project-foundation-v1/acceptance.md',
       '.agents/skills/flutter-add-component/SKILL.md',
       '.agents/skills/flutter-workflow-check/SKILL.md',
       '.agents/skills/flutter-resume-flow/SKILL.md',
@@ -70,6 +76,13 @@ void main() {
       ),
     );
     installedPack.writeAsStringSync('stale managed pack\n');
+    final installedFoundationPack = File(
+      _join(
+        valid.path,
+        '.flutter-workflow/component-packs/project-foundation-v1/pack.yaml',
+      ),
+    );
+    installedFoundationPack.writeAsStringSync('stale foundation pack\n');
     final installedOutputTemplates = File(
       _join(valid.path, '.flutter-workflow/output-templates.md'),
     );
@@ -93,6 +106,18 @@ void main() {
     _expect(
       installedPack.readAsStringSync() == sourcePack.readAsStringSync(),
       'Reinstallation did not refresh the managed component pack.',
+    );
+    final sourceFoundationPack = File(
+      _join(
+        repositoryRoot.path,
+        'template/.flutter-workflow/component-packs/'
+        'project-foundation-v1/pack.yaml',
+      ),
+    );
+    _expect(
+      installedFoundationPack.readAsStringSync() ==
+          sourceFoundationPack.readAsStringSync(),
+      'Reinstallation did not refresh the managed foundation pack.',
     );
     final sourceOutputTemplates = File(
       _join(
@@ -148,7 +173,7 @@ void main() {
       'Installation metadata does not use the central workflow identity.',
     );
 
-    final questions = File(
+    final authQuestions = File(
       _join(
         repositoryRoot.path,
         'template/.flutter-workflow/component-packs/'
@@ -156,10 +181,55 @@ void main() {
       ),
     ).readAsStringSync();
     _expect(
-      questions.contains('Question X of Y · Z questions remaining') &&
-          questions.contains('Custom Field 1 · Step 2 of 5'),
+      authQuestions.contains('Question X of Y · Z questions remaining') &&
+          authQuestions.contains('Custom Field 1 · Step 2 of 5'),
       'The component Pack is missing its question progress contract.',
     );
+
+    final foundationRoot =
+        'template/.flutter-workflow/component-packs/project-foundation-v1';
+    final foundationQuestions = File(
+      _join(repositoryRoot.path, '$foundationRoot/questions.md'),
+    ).readAsStringSync();
+    final foundationDiscovery = File(
+      _join(repositoryRoot.path, '$foundationRoot/discovery.md'),
+    ).readAsStringSync();
+    final foundationArchitecture = File(
+      _join(repositoryRoot.path, '$foundationRoot/architecture.md'),
+    ).readAsStringSync();
+    for (final expected in [
+      'Question X of 7 · Z questions remaining',
+      'Corporate Blue',
+      'Emerald Teal',
+      'Indigo Violet',
+      'Charcoal Orange',
+      'Configure Later',
+    ]) {
+      _expect(
+        foundationQuestions.contains(expected),
+        'Foundation questions are missing $expected.',
+      );
+    }
+    _expect(
+      foundationDiscovery.contains('no Dart file other than `lib/main.dart`') &&
+          foundationDiscovery.contains('set the Work Item to `BLOCKED`'),
+      'Foundation discovery does not enforce fresh-project refusal.',
+    );
+    for (final expected in [
+      '`AppButton`',
+      '`AppTextField`',
+      '`AppDropdown`',
+      '`AppCheckbox`',
+      '`AppScaffold`',
+      '`AppAppBar`',
+      '`AppCard`',
+      '`API_BASE_URL`',
+    ]) {
+      _expect(
+        foundationArchitecture.contains(expected),
+        'Foundation architecture is missing $expected.',
+      );
+    }
 
     const skillNames = <String>[
       'flutter-project-init',
@@ -202,6 +272,19 @@ void main() {
         '$skillName does not use shared templates and source metadata.',
       );
     }
+    final componentSkill = File(
+      _join(
+        repositoryRoot.path,
+        'template/.agents/skills/flutter-add-component/SKILL.md',
+      ),
+    ).readAsStringSync();
+    _expect(
+      componentSkill.contains('declared `conflict_policy`') &&
+          componentSkill.contains('foundation Packs before feature Packs') &&
+          componentSkill.contains('`work-item.yaml`, `spec.md`') &&
+          componentSkill.contains('`plan.md`, and `result.md`'),
+      'Component Skill does not honor Pack-specific policy and catalog order.',
+    );
 
     final checkSkill = File(
       _join(
