@@ -13,7 +13,7 @@ the result.
 │ Automation: OpenAI Codex                       │
 ╰────────────────────────────────────────────────╯
 
-created by Adel Mohsen
+created by Innova Team
 ```
 
 ## What V1 provides
