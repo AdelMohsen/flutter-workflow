@@ -34,9 +34,12 @@ void main() {
     const installedPaths = <String>[
       'FLUTTER-WORKFLOW.md',
       '.flutter-workflow/workflow.json',
+      '.flutter-workflow/output-templates.md',
       '.flutter-workflow/component-packs/auth-account-v1/pack.yaml',
       '.flutter-workflow/component-packs/auth-account-v1/questions.md',
       '.agents/skills/flutter-add-component/SKILL.md',
+      '.agents/skills/flutter-workflow-check/SKILL.md',
+      '.agents/skills/flutter-resume-flow/SKILL.md',
     ];
     for (final relativePath in installedPaths) {
       _expect(
@@ -67,6 +70,10 @@ void main() {
       ),
     );
     installedPack.writeAsStringSync('stale managed pack\n');
+    final installedOutputTemplates = File(
+      _join(valid.path, '.flutter-workflow/output-templates.md'),
+    );
+    installedOutputTemplates.writeAsStringSync('stale managed templates\n');
 
     final secondInstall = _runInstaller(installer, valid);
     _expect(secondInstall.exitCode == 0, secondInstall.stderr.toString());
@@ -87,6 +94,47 @@ void main() {
       installedPack.readAsStringSync() == sourcePack.readAsStringSync(),
       'Reinstallation did not refresh the managed component pack.',
     );
+    final sourceOutputTemplates = File(
+      _join(
+        repositoryRoot.path,
+        'template/.flutter-workflow/output-templates.md',
+      ),
+    );
+    _expect(
+      installedOutputTemplates.readAsStringSync() ==
+          sourceOutputTemplates.readAsStringSync(),
+      'Reinstallation did not refresh the managed output templates.',
+    );
+    final templateText = sourceOutputTemplates.readAsStringSync();
+    for (final section in [
+      '## Goal',
+      '## Expected Behavior',
+      '## Positive / Negative / Edge Cases',
+      '## UI States',
+      '## Reuse Decisions',
+      '## Affected Layers / Platforms',
+      '## Dependencies / Security',
+      '## Out of Scope',
+      '## Verification',
+      '## Approval',
+      '## Outcome',
+      '## Implementation Changes',
+      '## Interfaces and Data Flow',
+      '## Failure Behavior',
+      '## Files and Layers',
+      '## Dependencies / Code Generation',
+      '## Summary',
+      '## Changed Files',
+      '## Verification Evidence',
+      '## Remaining TODOs',
+      '## Pre-existing Failures',
+      '## Final Status',
+    ]) {
+      _expect(
+        templateText.contains(section),
+        'Shared output templates are missing $section.',
+      );
+    }
 
     final metadata = jsonDecode(
       File(
@@ -119,6 +167,8 @@ void main() {
       'flutter-change-feature',
       'flutter-fix-bug',
       'flutter-add-component',
+      'flutter-workflow-check',
+      'flutter-resume-flow',
     ];
     for (final skillName in skillNames) {
       final skill = File(
@@ -130,6 +180,66 @@ void main() {
       _expect(
         skill.contains('standard startup banner'),
         '$skillName does not use the shared startup banner.',
+      );
+    }
+
+    const deliverySkillNames = <String>[
+      'flutter-new-feature',
+      'flutter-change-feature',
+      'flutter-fix-bug',
+      'flutter-add-component',
+    ];
+    for (final skillName in deliverySkillNames) {
+      final skill = File(
+        _join(
+          repositoryRoot.path,
+          'template/.agents/skills/$skillName/SKILL.md',
+        ),
+      ).readAsStringSync();
+      _expect(
+        skill.contains('.flutter-workflow/output-templates.md') &&
+            skill.contains('source skill'),
+        '$skillName does not use shared templates and source metadata.',
+      );
+    }
+
+    final checkSkill = File(
+      _join(
+        repositoryRoot.path,
+        'template/.agents/skills/flutter-workflow-check/SKILL.md',
+      ),
+    ).readAsStringSync();
+    for (final state in [
+      'NOT_INITIALIZED',
+      'INCOMPLETE',
+      'VERSION_MISMATCH',
+      'OCCUPIED',
+      'ATTENTION',
+    ]) {
+      _expect(
+        checkSkill.contains(state),
+        'Workflow Check is missing the $state contract.',
+      );
+    }
+
+    final resumeSkill = File(
+      _join(
+        repositoryRoot.path,
+        'template/.agents/skills/flutter-resume-flow/SKILL.md',
+      ),
+    ).readAsStringSync();
+    for (final state in [
+      'NEEDS_INPUT',
+      'NEEDS_EVIDENCE',
+      'PLAYBACK_READY',
+      'PLAN_READY',
+      'BLOCKED',
+      'VERIFIED',
+      'CANCELLED',
+    ]) {
+      _expect(
+        resumeSkill.contains(state),
+        'Resume Flow is missing the $state contract.',
       );
     }
 

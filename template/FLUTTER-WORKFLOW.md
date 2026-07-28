@@ -17,6 +17,8 @@ Workflow identity and release metadata live only in
 | `flutter flow:change` | `$flutter-change-feature` |
 | `flutter flow:bug` | `$flutter-fix-bug` |
 | `flutter component:add` | `$flutter-add-component` |
+| `flutter workflow:check` | `$flutter-workflow-check` |
+| `flutter flow:resume` | `$flutter-resume-flow` |
 
 ## Startup banner
 
@@ -46,15 +48,17 @@ For every flow:
 
 1. Read `.flutter-workflow/workflow.json` and this file completely.
 2. Render the startup banner once.
-3. Read `.flutter-workflow/constitution.md` and
+3. Read `.flutter-workflow/output-templates.md`.
+4. Read `.flutter-workflow/constitution.md` and
    `.flutter-workflow/project-profile.md` when they exist.
-4. Read the selected skill completely.
-5. Read repository guidance such as `AGENTS.md`, `rules.md`, or equivalent.
-6. Inspect the relevant code, dependencies, shared widgets, and generated-code
+5. Read the selected skill completely.
+6. Read repository guidance such as `AGENTS.md`, `rules.md`, or equivalent.
+7. Inspect the relevant code, dependencies, shared widgets, and generated-code
    conventions before asking discoverable questions.
 
-If initialization has not completed, delivery flows stop and ask the developer
-to send `flutter workflow:init`.
+If initialization has not completed, delivery and resume flows stop and ask the
+developer to send `flutter workflow:init`. Project initialization and
+`flutter workflow:check` do not require completed initialization.
 
 ## Shared delivery contract
 
@@ -118,6 +122,10 @@ Comments and requested changes do not imply approval. If implementation reveals
 an undeclared material impact, stop, update the playback and plan, and obtain
 approval again.
 
+Use the shared structures in `.flutter-workflow/output-templates.md`. Display
+`Approve Playback` and `Approve Plan` as suggested responses, but accept any
+unmistakable approval in the developer's language.
+
 ## Work items
 
 Store each `new`, `change`, `bug`, or `component` flow under:
@@ -137,6 +145,7 @@ schema_version: "1.0"
 id: "FW-0001"
 type: "new"
 slug: "descriptive-kebab-case"
+source_skill: "flutter-new-feature"
 status: "DISCOVERY"
 language: "English"
 created_at: "ISO-8601 UTC"
@@ -145,6 +154,15 @@ approvals:
   playback: "pending"
   plan: "pending"
 ```
+
+Component Work Items also contain:
+
+```yaml
+pack_id: "auth-account-v1"
+```
+
+For legacy Work Items without `source_skill`, resume by mapping `type` to its
+canonical Skill. Do not rewrite metadata only to upgrade its schema.
 
 Allowed states:
 
@@ -162,9 +180,24 @@ BLOCKED
 CANCELLED
 ```
 
+`VERIFIED` and `CANCELLED` are terminal. Every other state is resumable.
+
+| Status | Next action |
+| --- | --- |
+| `DISCOVERY` | Continue discovery |
+| `NEEDS_INPUT` | Answer the pending question |
+| `NEEDS_EVIDENCE` | Provide the recorded evidence |
+| `PLAYBACK_READY` | Review or approve Playback |
+| `PLAYBACK_APPROVED` | Create or complete Plan |
+| `PLAN_READY` | Review or approve Plan |
+| `PLAN_APPROVED` | Check drift, then implement |
+| `IMPLEMENTING` | Check drift, then continue implementation |
+| `BLOCKED` | Recheck the recorded blocker |
+
 `spec.md` owns the approved playback. `plan.md` owns the approved plan.
 `result.md` records changed files, verification commands and results, remaining
-TODOs, and any pre-existing unrelated failures.
+TODOs, and any pre-existing unrelated failures. All three use the shared output
+templates.
 
 ## Verification
 

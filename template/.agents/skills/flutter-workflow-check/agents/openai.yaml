@@ -1,0 +1,4 @@
+interface:
+  display_name: "Flutter Workflow Check"
+  short_description: "Inspect Flutter workflow readiness and progress"
+  default_prompt: "Use $flutter-workflow-check to inspect this project workflow status and next action."

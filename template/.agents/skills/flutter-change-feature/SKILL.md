@@ -14,10 +14,11 @@ consumers.
    `.flutter-workflow/workflow.json` with flow `Change Feature` and the current
    workspace name. Render it once. Do not execute the chat token or start
    another coding agent.
-2. Read `FLUTTER-WORKFLOW.md`, constitution/profile, repository guidance, and
-   the complete affected feature. Require completed initialization.
+2. Read `FLUTTER-WORKFLOW.md`, `.flutter-workflow/output-templates.md`,
+   constitution/profile, repository guidance, and the complete affected
+   feature. Require completed initialization.
 3. Identify the feature and change slug. Create the next work item with type
-   `change` and state `DISCOVERY`.
+   `change`, source skill `flutter-change-feature`, and state `DISCOVERY`.
 4. Baseline current behavior before proposing a delta:
    - inspect UI, state, repositories, models, routes, localization, platforms,
      integrations, callers, consumers, and documentation;
@@ -26,13 +27,14 @@ consumers.
 5. Ask one material question at a time about current, requested final,
    unchanged, compatibility, migration, and out-of-scope behavior.
 6. Search for reusable code, widgets, helpers, and installed packages.
-7. Create `spec.md` and present one combined Playback covering behavior,
+7. Create `spec.md` from the shared Playback template, covering behavior,
    positive/negative/edge and UI states, the minimal delta, consumers,
    compatibility, preserved architecture, packages/platforms, and verification.
 8. Set `PLAYBACK_READY`; wait for explicit approval and then record
    `PLAYBACK_APPROVED`.
-9. Create a decision-complete minimal `plan.md`. Set `PLAN_READY`; wait for
-   explicit approval and then record `PLAN_APPROVED`.
+9. Create a decision-complete minimal `plan.md` from the shared Plan template.
+   Set `PLAN_READY`; wait for explicit approval and then record
+   `PLAN_APPROVED`.
 10. Implement the approved delta. Preserve the affected feature's architecture,
     even when it differs from the new-feature BLoC contract. Migrate architecture
     only when explicitly requested and approved.
@@ -40,8 +42,8 @@ consumers.
     package, data, security, or cross-feature impact appears.
 12. Format changed Dart files, run affected code generation, run
     `flutter analyze`, and exercise the changed scenario when available.
-13. Write `result.md` and set `VERIFIED` only when required checks pass;
-    otherwise set `BLOCKED` with exact evidence.
+13. Write `result.md` from the shared Result template and set `VERIFIED` only
+    when required checks pass; otherwise set `BLOCKED` with exact evidence.
 
 ## Boundaries
 

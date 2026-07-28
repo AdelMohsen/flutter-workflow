@@ -25,6 +25,8 @@ created by Adel Mohsen
 | `flutter flow:change` | Safely change an existing feature |
 | `flutter flow:bug` | Reproduce, trace, and fix a defect at its root cause |
 | `flutter component:add` | Configure and add a reusable Feature Pack |
+| `flutter workflow:check` | Report workflow readiness, progress, and next actions |
+| `flutter flow:resume` | Continue a saved Work Item without losing approvals |
 
 V1 is intentionally small. It does not create Flutter projects, use Spec Kit,
 run a whole-project audit, or require unit/widget tests.
@@ -79,10 +81,13 @@ flutter-project/
 │       ├── flutter-new-feature/
 │       ├── flutter-change-feature/
 │       ├── flutter-fix-bug/
-│       └── flutter-add-component/
+│       ├── flutter-add-component/
+│       ├── flutter-workflow-check/
+│       └── flutter-resume-flow/
 └── .flutter-workflow/
     ├── workflow.json
     ├── installation.json
+    ├── output-templates.md
     ├── component-packs/
     │   └── auth-account-v1/
     └── work-items/
@@ -260,6 +265,42 @@ Pack records the conflict and stops without merging, overwriting, renaming, or
 partially generating files. Other architecture differences are recorded and
 handled as approved prerequisites rather than blockers.
 
+## Check workflow readiness
+
+Send:
+
+```text
+flutter workflow:check
+```
+
+Or:
+
+```text
+$flutter-workflow-check
+```
+
+The read-only check reports project, installation, initialization, Pack target,
+and resumable Work Item status with the next action. It does not edit files,
+create Work Items, use the network, or run analysis/build commands.
+
+## Resume saved work
+
+Send:
+
+```text
+flutter flow:resume
+```
+
+Or:
+
+```text
+$flutter-resume-flow
+```
+
+Codex continues the only resumable Work Item automatically. When several exist,
+it asks for one ID. Saved approvals and completed questions are preserved;
+`VERIFIED` and `CANCELLED` items are not resumed.
+
 ## Approval flow
 
 Every `new`, `change`, `bug`, and `component` flow uses two explicit gates:
@@ -270,6 +311,16 @@ Every `new`, `change`, `bug`, and `component` flow uses two explicit gates:
 
 Production code is not changed before both approvals. If implementation reveals
 an undeclared material impact, Codex returns to the playback and plan.
+
+Each gate suggests a consistent response:
+
+```text
+Approve Playback
+Approve Plan
+```
+
+Any unmistakable approval in the developer's language is accepted. Comments,
+questions, and requested edits are not approval.
 
 ## Work items
 
@@ -283,7 +334,9 @@ Each delivery flow records its state under:
 └── result.md
 ```
 
-These files preserve decisions and allow another Codex task to resume the work.
+These files use shared Playback, Plan, and Result templates. Metadata records
+the source Skill and, for component work, the Pack ID. Legacy Work Items without
+those fields remain resumable through their `type`.
 
 ## Verification
 

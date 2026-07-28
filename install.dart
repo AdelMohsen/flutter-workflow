@@ -4,12 +4,15 @@ import 'dart:io';
 const managedPaths = <String>[
   'FLUTTER-WORKFLOW.md',
   '.flutter-workflow/workflow.json',
+  '.flutter-workflow/output-templates.md',
   '.flutter-workflow/component-packs',
   '.agents/skills/flutter-project-init',
   '.agents/skills/flutter-new-feature',
   '.agents/skills/flutter-change-feature',
   '.agents/skills/flutter-fix-bug',
   '.agents/skills/flutter-add-component',
+  '.agents/skills/flutter-workflow-check',
+  '.agents/skills/flutter-resume-flow',
 ];
 
 void main(List<String> args) {

@@ -14,11 +14,12 @@ infrastructure, packages, widgets, and conventions.
    `.flutter-workflow/workflow.json` with flow `New Feature` and the current
    workspace name. Render it once. Do not execute the chat token or start
    another coding agent.
-2. Read `FLUTTER-WORKFLOW.md`, the approved constitution/profile, repository
-   guidance, and relevant code. If initialization is incomplete, stop and ask
-   for `flutter workflow:init`.
+2. Read `FLUTTER-WORKFLOW.md`, `.flutter-workflow/output-templates.md`, the
+   approved constitution/profile, repository guidance, and relevant code. If
+   initialization is incomplete, stop and ask for `flutter workflow:init`.
 3. Identify the requested capability and a kebab-case slug. Create the next
-   `FW-NNNN-slug` work item with type `new` and state `DISCOVERY`.
+   `FW-NNNN-slug` work item with type `new`, source skill
+   `flutter-new-feature`, and state `DISCOVERY`.
 4. Prove the capability does not already exist. Search for reusable features,
    Cubits, repositories, models, validators, navigation, localization, theme,
    widgets, network/cache/error helpers, and installed packages.
@@ -26,7 +27,7 @@ infrastructure, packages, widgets, and conventions.
    outcome, inputs, validation, positive/negative/edge behavior, loading/error/
    empty states, navigation, permissions, persistence, and out-of-scope behavior
    only when relevant.
-6. Create `spec.md` and present one combined Playback:
+6. Create `spec.md` from the shared Playback template and present it:
    - functional behavior and acceptance scenarios;
    - unchanged and out-of-scope behavior;
    - reuse decisions and exact affected layers;
@@ -35,9 +36,10 @@ infrastructure, packages, widgets, and conventions.
    - package, platform, localization, security, and verification impact.
 7. Set `PLAYBACK_READY` and wait for explicit approval. Record approval and set
    `PLAYBACK_APPROVED`; comments do not approve.
-8. Create a decision-complete `plan.md` with interfaces, data flow, files,
-   failure behavior, code generation, validation, and rollout implications.
-   Set `PLAN_READY`, wait for explicit approval, then set `PLAN_APPROVED`.
+8. Create a decision-complete `plan.md` from the shared Plan template with
+   interfaces, data flow, files, failure behavior, code generation, validation,
+   and rollout implications. Set `PLAN_READY`, wait for explicit approval, then
+   set `PLAN_APPROVED`.
 9. Implement only the approved scope:
    - keep API calls and repository logic out of widgets;
    - keep Cubits independent of `BuildContext` and UI classes;
@@ -50,8 +52,9 @@ infrastructure, packages, widgets, and conventions.
     plan, and obtain approval again.
 11. Format changed Dart files, run affected code generation, run
     `flutter analyze`, and exercise the affected scenario when available.
-12. Write `result.md`, record exact evidence/TODOs, and set `VERIFIED` only when
-    required checks pass. Otherwise set `BLOCKED` and name the failure.
+12. Write `result.md` from the shared Result template, record exact
+    evidence/TODOs, and set `VERIFIED` only when required checks pass. Otherwise
+    set `BLOCKED` and name the failure.
 
 ## Boundaries
 
