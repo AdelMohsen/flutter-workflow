@@ -3,6 +3,7 @@
 set -euo pipefail
 
 repository_url="https://github.com/AdelMohsen/flutter-workflow.git"
+engine_ref="${FLUTTER_ENGINE_REF:-main}"
 target="$PWD"
 
 if [[ "${1:-}" == "--target" ]]; then
@@ -28,5 +29,6 @@ command -v dart >/dev/null || {
 temporary_directory="$(mktemp -d "${TMPDIR:-/tmp}/flutter-workflow.XXXXXX")"
 trap 'rm -rf -- "$temporary_directory"' EXIT
 
-git clone --depth 1 --quiet "$repository_url" "$temporary_directory/repository"
+git clone --depth 1 --branch "$engine_ref" --quiet \
+  "$repository_url" "$temporary_directory/repository"
 dart run "$temporary_directory/repository/install.dart" --target "$target"

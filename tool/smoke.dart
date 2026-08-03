@@ -2,357 +2,225 @@ import 'dart:convert';
 import 'dart:io';
 
 void main() {
-  final repositoryRoot = File(Platform.script.toFilePath()).parent.parent;
-  final installer = File(
-    '${repositoryRoot.path}${Platform.pathSeparator}install.dart',
-  );
-  final temporaryRoot = Directory.systemTemp.createTempSync(
-    'flutter-codex-workflow-smoke-',
+  final root = File(Platform.script.toFilePath()).parent.parent;
+  final installer = File(_join(root.path, 'install.dart'));
+  final temporary = Directory.systemTemp.createTempSync(
+    'flutter-engine-smoke-',
   );
 
   try {
-    final valid = Directory(
-      '${temporaryRoot.path}${Platform.pathSeparator}valid',
-    );
-    final invalid = Directory(
-      '${temporaryRoot.path}${Platform.pathSeparator}invalid',
-    );
-    _createFixture(valid, flutter: true);
-    _createFixture(invalid, flutter: false);
+    final valid = Directory(_join(temporary.path, 'valid'));
+    final invalid = Directory(_join(temporary.path, 'invalid'));
+    final legacy = Directory(_join(temporary.path, 'legacy'));
+    final pending = Directory(_join(temporary.path, 'pending'));
+    _fixture(valid, flutter: true);
+    _fixture(invalid, flutter: false);
+    _fixture(legacy, flutter: true);
+    _fixture(pending, flutter: true);
+    Directory(
+      _join(legacy.path, '.flutter-workflow/work-items'),
+    ).createSync(recursive: true);
 
-    final firstInstall = _runInstaller(installer, valid);
-    _expect(firstInstall.exitCode == 0, firstInstall.stderr.toString());
+    final first = _install(installer, valid);
+    _expect(first.exitCode == 0, first.stderr.toString());
+    final output = first.stdout.toString();
+    _expect(output.contains('Flutter Engine · v2.0.0'), 'Missing V2 banner.');
     _expect(
-      firstInstall.stdout.toString().contains('INNOVA DIGITS ENGINEERING'),
-      'The installation banner was not rendered.',
-    );
-    _expect(
-      firstInstall.stdout.toString().contains('created by Adel Mohsen'),
-      'The creator footer was not rendered.',
+      output.contains('created by Adel Mohsen'),
+      'Missing creator footer.',
     );
 
-    const installedPaths = <String>[
-      'FLUTTER-WORKFLOW.md',
-      '.flutter-workflow/workflow.json',
-      '.flutter-workflow/output-templates.md',
-      '.flutter-workflow/component-packs/auth-account-v1/pack.yaml',
-      '.flutter-workflow/component-packs/auth-account-v1/questions.md',
-      '.flutter-workflow/component-packs/project-foundation-v1/pack.yaml',
-      '.flutter-workflow/component-packs/project-foundation-v1/discovery.md',
-      '.flutter-workflow/component-packs/project-foundation-v1/questions.md',
-      '.flutter-workflow/component-packs/project-foundation-v1/architecture.md',
-      '.flutter-workflow/component-packs/project-foundation-v1/implementation.md',
-      '.flutter-workflow/component-packs/project-foundation-v1/acceptance.md',
-      '.agents/skills/flutter-add-component/SKILL.md',
-      '.agents/skills/flutter-workflow-check/SKILL.md',
-      '.agents/skills/flutter-resume-flow/SKILL.md',
+    const paths = [
+      '.specify/extensions/flutter-engine/engine.json',
+      '.specify/extensions/flutter-engine/extension.yml',
+      '.specify/extensions/flutter-engine/references/lifecycle.md',
+      '.specify/extensions/flutter-engine/references/security/owasp.md',
+      '.specify/extensions/flutter-engine/references/unit-testing/unit-tests.md',
+      '.specify/extensions/flutter-engine/components/project-foundation-v2/component.yml',
+      '.specify/extensions/flutter-engine/components/auth-account-v2/component.yml',
+      '.specify/templates/flutter-engine/spec.md',
+      '.specify/templates/flutter-engine/plan.md',
+      '.specify/templates/flutter-engine/tasks.md',
+      '.specify/templates/flutter-engine/decisions.md',
+      '.specify/templates/flutter-engine/result.md',
+      '.specify/workflows/flutter-engine-delivery/workflow.yml',
+      '.specify/workflows/flutter-engine-operations/workflow.yml',
+      '.specify/flutter-engine/engine.lock.json',
+      '.specify/flutter-engine/design/design-contract.json',
+      '.specify/flutter-engine/installed/project-profile.md',
+      '.agents/skills/flutter-engine/SKILL.md',
+      '.agents/skills/ponytail/SKILL.md',
+      '.agents/skills/flutter-owasp-security/SKILL.md',
+      '.agents/skills/flutter-unit-tests/SKILL.md',
     ];
-    for (final relativePath in installedPaths) {
-      _expect(
-        File(_join(valid.path, relativePath)).existsSync(),
-        'The installer missed $relativePath.',
-      );
+    for (final path in paths) {
+      _expect(File(_join(valid.path, path)).existsSync(), 'Missing $path.');
     }
 
-    final constitution = File(
-      _join(valid.path, '.flutter-workflow/constitution.md'),
-    );
     final profile = File(
-      _join(valid.path, '.flutter-workflow/project-profile.md'),
-    );
-    final workItem = File(
-      _join(valid.path, '.flutter-workflow/work-items/FW-0001-demo/spec.md'),
-    );
-    constitution.writeAsStringSync('project-owned\n');
-    profile.writeAsStringSync('project-owned\n');
-    workItem
-      ..parent.createSync(recursive: true)
-      ..writeAsStringSync('project-owned\n');
+      _join(valid.path, '.specify/flutter-engine/installed/project-profile.md'),
+    )..writeAsStringSync('project-owned profile\n');
+    final design = File(
+      _join(valid.path, '.specify/flutter-engine/design/design-contract.json'),
+    )..writeAsStringSync('{"project":"owned"}\n');
+    final managedSkill = File(
+      _join(valid.path, '.agents/skills/flutter-engine/SKILL.md'),
+    )..writeAsStringSync('stale managed skill\n');
 
-    final installedPack = File(
-      _join(
-        valid.path,
-        '.flutter-workflow/component-packs/auth-account-v1/pack.yaml',
-      ),
-    );
-    installedPack.writeAsStringSync('stale managed pack\n');
-    final installedFoundationPack = File(
-      _join(
-        valid.path,
-        '.flutter-workflow/component-packs/project-foundation-v1/pack.yaml',
-      ),
-    );
-    installedFoundationPack.writeAsStringSync('stale foundation pack\n');
-    final installedOutputTemplates = File(
-      _join(valid.path, '.flutter-workflow/output-templates.md'),
-    );
-    installedOutputTemplates.writeAsStringSync('stale managed templates\n');
-
-    final secondInstall = _runInstaller(installer, valid);
-    _expect(secondInstall.exitCode == 0, secondInstall.stderr.toString());
-    for (final file in [constitution, profile, workItem]) {
-      _expect(
-        file.readAsStringSync() == 'project-owned\n',
-        'Reinstallation changed project-owned ${file.path}.',
-      );
-    }
-    final sourcePack = File(
-      _join(
-        repositoryRoot.path,
-        'template/.flutter-workflow/component-packs/'
-        'auth-account-v1/pack.yaml',
-      ),
+    final second = _install(installer, valid);
+    _expect(second.exitCode == 0, second.stderr.toString());
+    _expect(
+      profile.readAsStringSync() == 'project-owned profile\n',
+      'Reinstall replaced the project profile.',
     );
     _expect(
-      installedPack.readAsStringSync() == sourcePack.readAsStringSync(),
-      'Reinstallation did not refresh the managed component pack.',
-    );
-    final sourceFoundationPack = File(
-      _join(
-        repositoryRoot.path,
-        'template/.flutter-workflow/component-packs/'
-        'project-foundation-v1/pack.yaml',
-      ),
+      design.readAsStringSync() == '{"project":"owned"}\n',
+      'Reinstall replaced the Design Contract.',
     );
     _expect(
-      installedFoundationPack.readAsStringSync() ==
-          sourceFoundationPack.readAsStringSync(),
-      'Reinstallation did not refresh the managed foundation pack.',
+      managedSkill.readAsStringSync().contains('name: flutter-engine'),
+      'Reinstall did not refresh managed skills.',
     );
-    final sourceOutputTemplates = File(
-      _join(
-        repositoryRoot.path,
-        'template/.flutter-workflow/output-templates.md',
-      ),
-    );
-    _expect(
-      installedOutputTemplates.readAsStringSync() ==
-          sourceOutputTemplates.readAsStringSync(),
-      'Reinstallation did not refresh the managed output templates.',
-    );
-    final templateText = sourceOutputTemplates.readAsStringSync();
-    for (final section in [
-      '## Goal',
-      '## Expected Behavior',
-      '## Positive / Negative / Edge Cases',
-      '## UI States',
-      '## Reuse Decisions',
-      '## Affected Layers / Platforms',
-      '## Dependencies / Security',
-      '## Out of Scope',
-      '## Verification',
-      '## Approval',
-      '## Outcome',
-      '## Implementation Changes',
-      '## Interfaces and Data Flow',
-      '## Failure Behavior',
-      '## Files and Layers',
-      '## Dependencies / Code Generation',
-      '## Summary',
-      '## Changed Files',
-      '## Verification Evidence',
-      '## Remaining TODOs',
-      '## Pre-existing Failures',
-      '## Final Status',
-    ]) {
-      _expect(
-        templateText.contains(section),
-        'Shared output templates are missing $section.',
-      );
-    }
 
-    final metadata = jsonDecode(
+    final lock = jsonDecode(
       File(
-        _join(valid.path, '.flutter-workflow/installation.json'),
+        _join(valid.path, '.specify/flutter-engine/engine.lock.json'),
+      ).readAsStringSync(),
+    );
+    _expect(lock is Map && lock['version'] == '2.0.0', 'Invalid Engine lock.');
+    _expect(
+      lock['managed_checksums'] is Map &&
+          (lock['managed_checksums'] as Map).isNotEmpty,
+      'Managed SHA-256 checksums were not recorded.',
+    );
+    _expect(lock['migration_state'] == 'not_required', 'Unexpected migration.');
+    _expect(
+      File(
+        _join(valid.path, '.gitignore'),
+      ).readAsStringSync().contains('.specify/flutter-engine/cache/'),
+      'Session cache is not ignored.',
+    );
+    final extensions = File(
+      _join(valid.path, '.specify/extensions.yml'),
+    ).readAsStringSync();
+    _expect(
+      extensions.contains('- flutter-engine'),
+      'Spec Kit did not register the Engine extension.',
+    );
+    final workflowRegistry = jsonDecode(
+      File(
+        _join(valid.path, '.specify/workflows/workflow-registry.json'),
       ).readAsStringSync(),
     );
     _expect(
-      metadata is Map &&
-          metadata['version'] == '1.0.0' &&
-          metadata['organization'] == 'INNOVA DIGITS',
-      'Installation metadata does not use the central workflow identity.',
+      workflowRegistry is Map &&
+          (workflowRegistry['workflows'] as Map).containsKey(
+            'flutter-engine-delivery',
+          ) &&
+          (workflowRegistry['workflows'] as Map).containsKey(
+            'flutter-engine-operations',
+          ),
+      'Spec Kit did not register both Engine workflows.',
     );
 
-    final authQuestions = File(
-      _join(
-        repositoryRoot.path,
-        'template/.flutter-workflow/component-packs/'
-        'auth-account-v1/questions.md',
-      ),
-    ).readAsStringSync();
+    final changedLock = Map<String, dynamic>.from(lock as Map);
+    changedLock['version'] = '1.9.0';
+    File(
+      _join(valid.path, '.specify/flutter-engine/engine.lock.json'),
+    ).writeAsStringSync(jsonEncode(changedLock));
+    final refusedUpdate = _install(installer, valid);
     _expect(
-      authQuestions.contains('Question X of Y · Z questions remaining') &&
-          authQuestions.contains('Custom Field 1 · Step 2 of 5'),
-      'The component Pack is missing its question progress contract.',
+      refusedUpdate.exitCode != 0 &&
+          refusedUpdate.stderr.toString().contains('requires an approved'),
+      'Installer changed the pinned Engine version without approval.',
     );
-
-    final foundationRoot =
-        'template/.flutter-workflow/component-packs/project-foundation-v1';
-    final foundationQuestions = File(
-      _join(repositoryRoot.path, '$foundationRoot/questions.md'),
-    ).readAsStringSync();
-    final foundationDiscovery = File(
-      _join(repositoryRoot.path, '$foundationRoot/discovery.md'),
-    ).readAsStringSync();
-    final foundationArchitecture = File(
-      _join(repositoryRoot.path, '$foundationRoot/architecture.md'),
-    ).readAsStringSync();
-    for (final expected in [
-      'Question X of 7 · Z questions remaining',
-      'Corporate Blue',
-      'Emerald Teal',
-      'Indigo Violet',
-      'Charcoal Orange',
-      'Configure Later',
-    ]) {
-      _expect(
-        foundationQuestions.contains(expected),
-        'Foundation questions are missing $expected.',
-      );
-    }
+    final approvedUpdate = _install(installer, valid, allowVersionUpdate: true);
     _expect(
-      foundationDiscovery.contains('no Dart file other than `lib/main.dart`') &&
-          foundationDiscovery.contains('set the Work Item to `BLOCKED`'),
-      'Foundation discovery does not enforce fresh-project refusal.',
+      approvedUpdate.exitCode == 0,
+      'Explicitly approved version update was refused.',
     );
-    for (final expected in [
-      '`AppButton`',
-      '`AppTextField`',
-      '`AppDropdown`',
-      '`AppCheckbox`',
-      '`AppScaffold`',
-      '`AppAppBar`',
-      '`AppCard`',
-      '`API_BASE_URL`',
-    ]) {
-      _expect(
-        foundationArchitecture.contains(expected),
-        'Foundation architecture is missing $expected.',
-      );
-    }
 
-    const skillNames = <String>[
-      'flutter-project-init',
-      'flutter-new-feature',
-      'flutter-change-feature',
-      'flutter-fix-bug',
-      'flutter-add-component',
-      'flutter-workflow-check',
-      'flutter-resume-flow',
-    ];
-    for (final skillName in skillNames) {
-      final skill = File(
-        _join(
-          repositoryRoot.path,
-          'template/.agents/skills/$skillName/SKILL.md',
-        ),
-      ).readAsStringSync();
-      _expect(
-        skill.contains('standard startup banner'),
-        '$skillName does not use the shared startup banner.',
-      );
-    }
-
-    const deliverySkillNames = <String>[
-      'flutter-new-feature',
-      'flutter-change-feature',
-      'flutter-fix-bug',
-      'flutter-add-component',
-    ];
-    for (final skillName in deliverySkillNames) {
-      final skill = File(
-        _join(
-          repositoryRoot.path,
-          'template/.agents/skills/$skillName/SKILL.md',
-        ),
-      ).readAsStringSync();
-      _expect(
-        skill.contains('.flutter-workflow/output-templates.md') &&
-            skill.contains('source skill'),
-        '$skillName does not use shared templates and source metadata.',
-      );
-    }
-    final componentSkill = File(
-      _join(
-        repositoryRoot.path,
-        'template/.agents/skills/flutter-add-component/SKILL.md',
-      ),
-    ).readAsStringSync();
+    final legacyInstall = _install(installer, legacy);
+    _expect(legacyInstall.exitCode == 0, legacyInstall.stderr.toString());
+    final legacyLock = jsonDecode(
+      File(
+        _join(legacy.path, '.specify/flutter-engine/engine.lock.json'),
+      ).readAsStringSync(),
+    );
     _expect(
-      componentSkill.contains('declared `conflict_policy`') &&
-          componentSkill.contains('foundation Packs before feature Packs') &&
-          componentSkill.contains('`work-item.yaml`, `spec.md`') &&
-          componentSkill.contains('`plan.md`, and `result.md`'),
-      'Component Skill does not honor Pack-specific policy and catalog order.',
+      legacyLock['migration_state'] == 'pending_plan',
+      'V1 migration was not detected.',
+    );
+    _expect(
+      Directory(_join(legacy.path, '.flutter-workflow')).existsSync(),
+      'Installer deleted V1 before an approved migration.',
     );
 
-    final checkSkill = File(
+    final pendingInstall = _install(installer, pending, withoutSpecKit: true);
+    _expect(pendingInstall.exitCode == 0, pendingInstall.stderr.toString());
+    final pendingLock = jsonDecode(
+      File(
+        _join(pending.path, '.specify/flutter-engine/engine.lock.json'),
+      ).readAsStringSync(),
+    );
+    _expect(
+      pendingLock['spec_kit_status'] == 'pending setup',
+      'Missing Spec Kit did not defer safely to flow:setup.',
+    );
+
+    final lifecycle = File(
       _join(
-        repositoryRoot.path,
-        'template/.agents/skills/flutter-workflow-check/SKILL.md',
+        root.path,
+        'template/.specify/extensions/flutter-engine/references/lifecycle.md',
       ),
     ).readAsStringSync();
-    for (final state in [
-      'NOT_INITIALIZED',
-      'INCOMPLETE',
-      'VERSION_MISMATCH',
-      'OCCUPIED',
-      'ATTENTION',
+    for (final phrase in [
+      'There is no Playback gate',
+      'plan hash',
+      'ACTIVE_SESSION_EXISTS',
+      'Do not spawn subagents',
     ]) {
-      _expect(
-        checkSkill.contains(state),
-        'Workflow Check is missing the $state contract.',
-      );
+      _expect(lifecycle.contains(phrase), 'Lifecycle missing: $phrase');
     }
 
-    final resumeSkill = File(
+    final commands = File(
       _join(
-        repositoryRoot.path,
-        'template/.agents/skills/flutter-resume-flow/SKILL.md',
+        root.path,
+        'template/.specify/extensions/flutter-engine/references/commands/commands.md',
       ),
     ).readAsStringSync();
-    for (final state in [
-      'NEEDS_INPUT',
-      'NEEDS_EVIDENCE',
-      'PLAYBACK_READY',
-      'PLAN_READY',
-      'BLOCKED',
-      'VERIFIED',
-      'CANCELLED',
+    for (final command in [
+      'flow:setup',
+      'flow:onboard',
+      'flow:component',
+      'flow:design-sync',
+      'flow:feature',
+      'flow:change',
+      'flow:bug',
+      'flow:unit-test',
+      'flow:test',
+      'flow:resume',
+      'flow:check',
+      'flow:engine-update',
     ]) {
-      _expect(
-        resumeSkill.contains(state),
-        'Resume Flow is missing the $state contract.',
-      );
+      _expect(commands.contains(command), 'Command contract missing $command.');
     }
 
-    final invalidInstall = _runInstaller(installer, invalid);
-    _expect(invalidInstall.exitCode != 0, 'A non-Flutter target was accepted.');
-
-    stdout.writeln('Installer smoke check passed.');
+    final bad = _install(installer, invalid);
+    _expect(bad.exitCode != 0, 'A non-Flutter target was accepted.');
+    stdout.writeln('Flutter Engine installer smoke check passed.');
   } finally {
-    temporaryRoot.deleteSync(recursive: true);
+    temporary.deleteSync(recursive: true);
   }
 }
 
-String _join(String root, String relativePath) {
-  return relativePath
-      .split('/')
-      .fold(root, (path, part) => '$path${Platform.pathSeparator}$part');
-}
-
-void _createFixture(Directory root, {required bool flutter}) {
-  Directory(
-    '${root.path}${Platform.pathSeparator}lib',
-  ).createSync(recursive: true);
-  File(
-    '${root.path}${Platform.pathSeparator}lib'
-    '${Platform.pathSeparator}main.dart',
-  ).writeAsStringSync('void main() {}\n');
-  File('${root.path}${Platform.pathSeparator}pubspec.yaml').writeAsStringSync(
+void _fixture(Directory root, {required bool flutter}) {
+  Directory(_join(root.path, 'lib')).createSync(recursive: true);
+  File(_join(root.path, 'lib/main.dart')).writeAsStringSync('void main() {}\n');
+  File(_join(root.path, 'pubspec.yaml')).writeAsStringSync(
     flutter
         ? '''
-name: workflow_smoke
+name: engine_smoke
 environment:
   sdk: ">=3.0.0 <4.0.0"
 dependencies:
@@ -360,23 +228,34 @@ dependencies:
     sdk: flutter
 '''
         : '''
-name: workflow_smoke
-environment:
-  sdk: ">=3.0.0 <4.0.0"
+name: engine_smoke
 dependencies: {}
 ''',
   );
 }
 
-ProcessResult _runInstaller(File installer, Directory target) {
-  return Process.runSync(Platform.resolvedExecutable, [
+ProcessResult _install(
+  File installer,
+  Directory target, {
+  bool allowVersionUpdate = false,
+  bool withoutSpecKit = false,
+}) => Process.runSync(
+  Platform.resolvedExecutable,
+  [
     'run',
     installer.path,
     '--target',
     target.path,
-  ], workingDirectory: installer.parent.path);
-}
+    if (allowVersionUpdate) '--allow-version-update',
+  ],
+  workingDirectory: installer.parent.path,
+  environment: withoutSpecKit ? {'PATH': '/usr/bin:/bin'} : null,
+);
 
-void _expect(bool condition, String message) {
-  if (!condition) throw StateError(message);
+String _join(String root, String relative) => relative
+    .split('/')
+    .fold(root, (path, part) => '$path${Platform.pathSeparator}$part');
+
+void _expect(bool value, String message) {
+  if (!value) throw StateError(message);
 }

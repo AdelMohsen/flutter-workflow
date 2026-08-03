@@ -1,434 +1,408 @@
-# Flutter Codex Workflow
+# Flutter Engine
 
-A lightweight, Codex-only delivery workflow for existing Flutter projects.
-
-It gives Codex a repeatable process for understanding a project, planning work,
-waiting for explicit approval, implementing the approved scope, and recording
-the result.
+Spec-driven Flutter delivery for OpenAI Codex, owned by **INNOVA DIGITS**.
 
 ```text
 ╭────────────────────────────────────────────────╮
 │ INNOVA DIGITS ENGINEERING                      │
-│ Flutter Delivery Workflow · v1.0.0             │
+│ Flutter Engine · v2.0.0                        │
 │ Automation: OpenAI Codex                       │
 ╰────────────────────────────────────────────────╯
 
-created by Innova Team
+created by Adel Mohsen
 ```
 
-## What V1 provides
+Flutter Engine is installed inside one Flutter project. It combines GitHub
+Spec Kit artifacts and gates with project-local Codex skills, Flutter-specific
+architecture/reuse rules, reusable component blueprints, Figma-aware design
+sync, OWASP guidance, and focused unit testing.
 
-| Chat command | Purpose |
-| --- | --- |
-| `flutter workflow:init` | Inspect the project and establish its workflow constitution and profile |
-| `flutter flow:new` | Clarify, plan, and build a new Flutter feature |
-| `flutter flow:change` | Safely change an existing feature |
-| `flutter flow:bug` | Reproduce, trace, and fix a defect at its root cause |
-| `flutter component:add` | Configure and add a reusable Feature Pack |
-| `flutter workflow:check` | Report workflow readiness, progress, and next actions |
-| `flutter flow:resume` | Continue a saved Work Item without losing approvals |
-
-V1 is intentionally small. It does not create Flutter projects, use Spec Kit,
-run a whole-project audit, or require unit/widget tests.
+It is not a Dart package, runtime framework, or terminal CLI. The public
+`flutter run flow:*` tokens below are messages sent to Codex. Terminal commands
+are used only to install the Engine, run project tools, or maintain releases.
 
 ## Requirements
 
-- An existing Flutter project containing `pubspec.yaml` and `lib/`
-- Dart available on `PATH` through a Flutter installation
-- Codex with project-local skill support
-- Git, if the installed workflow files will be committed with the target project
+- An existing Flutter project with `pubspec.yaml` and `lib/`.
+- Flutter/Dart and Git on `PATH`.
+- OpenAI Codex with project-local skill support.
+- [GitHub Spec Kit](https://github.com/github/spec-kit). If already installed,
+  the installer initializes its Codex integration. Otherwise `flow:setup`
+  installs/initializes a compatible release automatically before delivery work.
 
-The installer uses only the Dart standard library. This repository does not
-need its own `pubspec.yaml`.
+The installer uses only the Dart standard library and this repository has no
+`pubspec.yaml` of its own.
 
-## Install
+## One-command install
 
-### Install from inside the Flutter project
+Open a terminal in the root of the target Flutter project.
 
-On macOS, Linux, WSL, or Git Bash, open the Flutter project directory and run:
+### macOS, Linux, WSL, or Git Bash
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/AdelMohsen/flutter-workflow/main/install.sh | bash
 ```
 
-The current directory is used as the target. The script downloads the latest
-workflow into a temporary directory, runs the Dart installer, and removes the
-temporary clone.
+Install into another explicit target:
 
-### Install from a local clone
+```bash
+curl -fsSL https://raw.githubusercontent.com/AdelMohsen/flutter-workflow/main/install.sh \
+  | bash -s -- --target /absolute/path/to/flutter-project
+```
 
-Clone the workflow repository:
+### Windows PowerShell
+
+```powershell
+irm https://raw.githubusercontent.com/AdelMohsen/flutter-workflow/main/install.ps1 | iex
+```
+
+### Local clone
 
 ```bash
 git clone https://github.com/AdelMohsen/flutter-workflow.git
+dart run flutter-workflow/install.dart --target /absolute/path/to/flutter-project
 ```
 
-Then install it into a Flutter project:
+The download scripts clone into a temporary directory, install into the target,
+then remove the temporary clone. They never create a nested Git repository.
 
-```bash
-dart run flutter-workflow/install.dart \
-  --target /absolute/path/to/flutter-project
+After installation, open the Flutter project as a Codex task and send:
+
+```text
+flutter run flow:setup
 ```
 
-The installer verifies the target before writing and adds:
+Do not paste that line into a shell.
+
+## Installed layout
+
+Engine metadata is collected under `.specify` wherever Spec Kit permits. Codex
+skills are the necessary `.agents/skills` exception.
 
 ```text
 flutter-project/
-├── FLUTTER-WORKFLOW.md
-├── .agents/
-│   └── skills/
-│       ├── flutter-project-init/
-│       ├── flutter-new-feature/
-│       ├── flutter-change-feature/
-│       ├── flutter-fix-bug/
-│       ├── flutter-add-component/
-│       ├── flutter-workflow-check/
-│       └── flutter-resume-flow/
-└── .flutter-workflow/
-    ├── workflow.json
-    ├── installation.json
-    ├── output-templates.md
-    ├── component-packs/
-    │   ├── project-foundation-v1/
-    │   └── auth-account-v1/
-    └── work-items/
+├── .agents/skills/
+│   ├── flutter-engine/
+│   ├── ponytail/
+│   ├── flutter-owasp-security/
+│   ├── flutter-unit-tests/
+│   └── speckit-*/
+├── .specify/
+│   ├── integration.json
+│   ├── extensions/flutter-engine/
+│   │   ├── components/
+│   │   ├── commands/
+│   │   ├── references/
+│   │   ├── templates/
+│   │   └── third-party/ponytail/
+│   ├── templates/flutter-engine/
+│   ├── workflows/flutter-engine-delivery/
+│   ├── workflows/flutter-engine-operations/
+│   ├── memory/constitution.md
+│   ├── specs/<date>-<slug>-<short-id>/
+│   │   ├── spec.md
+│   │   ├── plan.md
+│   │   ├── tasks.md
+│   │   ├── decisions.md
+│   │   └── result.md
+│   └── flutter-engine/
+│       ├── engine.lock.json
+│       ├── design/design-contract.json
+│       ├── installed/
+│       ├── legacy/
+│       └── cache/
+└── .gitignore
 ```
 
-Re-running the installer updates only workflow-owned files. It preserves:
+Specs, plans, decisions, results, the Design Contract, component locks, and the
+Engine lock should be committed. Session/cache files are ignored. Production
+code remains in normal Flutter paths such as `lib/app`, `lib/core`, and
+`lib/features`; Engine documents are never scattered through production code.
+
+## Gate and Work Item rules
+
+Mutating flows discover and write `spec.md`, then produce a decision-complete
+`plan.md`. There is **no Playback approval**. There is one mandatory explicit
+Plan Approval before production or Engine-version changes.
+
+Suggested response:
 
 ```text
-.flutter-workflow/constitution.md
-.flutter-workflow/project-profile.md
-.flutter-workflow/work-items/
-```
-
-Commit the installed workflow files with the Flutter project so the whole team
-uses the same delivery rules.
-
-## Initialize the target project
-
-Open a Codex task rooted at the Flutter project, then send this message inside
-the Codex conversation:
-
-```text
-flutter workflow:init
-```
-
-This is a chat activation token, not a terminal command.
-
-Codex inspects:
-
-- project and feature structure;
-- BLoC/Cubit conventions;
-- repositories, networking, endpoints, models, errors, and cache;
-- dependency injection and navigation;
-- localization, RTL, theme, assets, and shared widgets;
-- validators, installed packages, code generation, and project commands.
-
-Codex presents an initialization playback and asks about material unknowns. It
-does not write the workflow documents until you approve the playback.
-
-After approval it creates:
-
-```text
-.flutter-workflow/
-├── constitution.md
-└── project-profile.md
-```
-
-- `constitution.md` contains the approved rules for future work.
-- `project-profile.md` records exact project paths, imports, reusable widgets,
-  helpers, packages, and commands.
-
-An architecture difference does not stop initialization. It is recorded for
-future decisions.
-
-## Create a new feature
-
-Send:
-
-```text
-flutter flow:new
-```
-
-Or invoke the skill directly:
-
-```text
-$flutter-new-feature
-```
-
-New features follow:
-
-```text
-Widget → Cubit → Repository → Network
-```
-
-Before adding code, Codex searches for existing project capabilities, Flutter
-or Dart native solutions, shared widgets, validators, helpers, and installed
-packages.
-
-If the project lacks a required BLoC, repository, or network prerequisite,
-Codex includes the smallest prerequisite in the playback and plan instead of
-stopping.
-
-## Change an existing feature
-
-Send:
-
-```text
-flutter flow:change
-```
-
-Or:
-
-```text
-$flutter-change-feature
-```
-
-Codex baselines the current implementation, identifies consumers, and proposes
-the smallest compatible delta. It preserves the existing feature architecture.
-It does not migrate that feature to BLoC unless the migration is explicitly
-requested and approved.
-
-## Fix a bug
-
-Send:
-
-```text
-flutter flow:bug
-```
-
-Or:
-
-```text
-$flutter-fix-bug
-```
-
-Codex collects the observed and expected behavior, reproduction steps,
-environment, and sanitized evidence. It traces callers and layers until it can
-prove the root cause.
-
-If the evidence is insufficient, the flow stops with `NEEDS_EVIDENCE`. It does
-not guess a fix.
-
-## Add a reusable Feature Pack
-
-Send:
-
-```text
-flutter component:add
-```
-
-Or invoke the skill directly:
-
-```text
-$flutter-add-component
-```
-
-Codex lists the installed Pack catalog. V1 provides:
-
-```text
-1. Project Foundation & UI Kit · v1.0.0
-2. Authentication & Account Management · v1.0.0
-```
-
-### Project Foundation & UI Kit
-
-Run this Pack after `flutter create` on a clean project. It refuses safely when
-`lib/app`, `lib/core`, alternate entrypoints, or additional Dart files already
-exist under `lib/`.
-
-It asks seven questions for:
-
-- App Display Name, bundle/application ID, and Dart package name;
-- one of four fixed primary/secondary color palettes;
-- Arabic or English as the default locale, while generating both with RTL/LTR;
-- `API_BASE_URL` or `Configure Later`;
-- Component Showcase or an Empty App Shell.
-
-The Pack configures only detected platforms and creates a Material 3 app shell,
-routing, DI, networking, errors/results, storage, validators, localization,
-light/dark themes, and reusable form/layout/feedback widgets.
-
-Its fixed approved stack is:
-
-```text
-flutter_bloc
-dio
-get_it
-go_router
-shared_preferences
-flutter_localizations
-intl
-```
-
-Component Showcase uses local demo data and performs no network request. The
-Pack does not create platforms, copy secrets, modify signing, or add Firebase,
-flavors, notifications, analytics, icons, or splash generation.
-
-### Authentication & Account Management
-
-This Pack inspects the current project before configuration and adapts to its
-network, errors, session/cache, navigation, localization, theme, validators,
-shared widgets, and code-generation conventions. Packs are agent Blueprints,
-not fixed Dart source copied across incompatible projects.
-
-The full Pack supports:
-
-- Email or Phone with Password or OTP;
-- Login, Registration, Verification, Forgot/Reset/Change Password, and Logout;
-- Profile, Update Profile, Change Identifier, Terms, and Delete Account;
-- standard and custom fields, Guest Mode, and post-registration behavior;
-- UI + Logic or Logic Only;
-- Arabic/English and RTL/LTR.
-
-Codex asks one question at a time and shows the current count:
-
-```text
-Authentication & Account Management
-Question 3 of 8 · 5 questions remaining
-```
-
-Conditional answers recalculate the remaining questions. Custom fields use a
-separate step counter while preserving the core count.
-
-Generated Pack code follows:
-
-```text
-Widget → Cubit → Repository → Network
-```
-
-If `lib/features/auth` or `lib/features/account_management` already exists, the
-Pack records the conflict and stops without merging, overwriting, renaming, or
-partially generating files. Other architecture differences are recorded and
-handled as approved prerequisites rather than blockers.
-
-## Check workflow readiness
-
-Send:
-
-```text
-flutter workflow:check
-```
-
-Or:
-
-```text
-$flutter-workflow-check
-```
-
-The read-only check reports project, installation, initialization, Pack target,
-and resumable Work Item status with the next action. It does not edit files,
-create Work Items, use the network, or run analysis/build commands.
-
-## Resume saved work
-
-Send:
-
-```text
-flutter flow:resume
-```
-
-Or:
-
-```text
-$flutter-resume-flow
-```
-
-Codex continues the only resumable Work Item automatically. When several exist,
-it asks for one ID. Saved approvals and completed questions are preserved;
-`VERIFIED` and `CANCELLED` items are not resumed.
-
-## Approval flow
-
-Every `new`, `change`, `bug`, and `component` flow uses two explicit gates:
-
-1. **Playback approval** — confirms behavior, edge cases, UI states, reuse,
-   affected layers, packages, platforms, and verification.
-2. **Plan approval** — confirms the decision-complete implementation plan.
-
-Production code is not changed before both approvals. If implementation reveals
-an undeclared material impact, Codex returns to the playback and plan.
-
-Each gate suggests a consistent response:
-
-```text
-Approve Playback
 Approve Plan
 ```
 
-Any unmistakable approval in the developer's language is accepted. Comments,
-questions, and requested edits are not approval.
+Any clear explicit approval is accepted. Comments, questions, or requested
+edits are not approvals. Approval is bound to the plan's SHA-256; a material
+scope, interface, dependency, security, or file-impact change invalidates it.
 
-## Work items
+One working copy permits one active Flow. The lock remains active while waiting
+for approval. The same work redirects to resume; another flow returns
+`ACTIVE_SESSION_EXISTS`. Crash recovery uses `flow:resume`—the Engine never
+expires the lock by age and never opens subagents, nested Codex tasks, forks, or
+parallel sessions.
 
-Each delivery flow records its state under:
+## Command reference
+
+### `flutter run flow:setup`
+
+Use immediately after installation or when managed files are missing.
+
+- Validates the Flutter target, installed Engine lock, Spec Kit, Codex
+  integration, skills, workflows, templates, and managed checksums.
+- Installs/initializes missing compatible Spec Kit files and repairs the current
+  pinned Engine version automatically.
+- Does not create a Work Item or require Plan Approval.
+- Does not modify Flutter production code, dependencies, SDK, Git branches,
+  commits, or remotes.
+- Never upgrades to another Engine version silently. Finish with `READY` or an
+  exact `ATTENTION` action.
+
+### `flutter run flow:onboard`
+
+Use when the project already exists and the Engine must understand it.
+
+- Discovers entrypoints, architecture and feature paths, BLoC/state management,
+  network/repositories/models/errors, routing, storage, localization/RTL, theme,
+  assets, shared widgets/form fields, platforms, packages, code generation,
+  tests, and verified project commands.
+- Writes project facts and constitution rules, not guesses.
+- Records architecture differences without stopping or forcing migration.
+- Does not change production code, create a Work Item, or require a plan.
+
+Run onboarding before modifying an established project. A clean project can
+instead add the Project Foundation component after setup.
+
+### `flutter run flow:component`
+
+Lists independently versioned components and their status:
 
 ```text
-.flutter-workflow/work-items/FW-NNNN-descriptive-slug/
-├── work-item.yaml
-├── spec.md
-├── plan.md
-└── result.md
+AVAILABLE · INSTALLED · UPDATE_AVAILABLE · CUSTOMIZED · NEEDS_REPAIR · CONFLICT
 ```
 
-These files use shared Playback, Plan, and Result templates. Metadata records
-the source Skill and, for component work, the Pack ID. Legacy Work Items without
-those fields remain resumable through their `type`.
+The user selects a component and `add`, `update`, or `repair`. The Engine runs
+component-specific discovery, asks one configuration question at a time, and
+uses the installed baseline, project modifications, and new component version
+for three-way reasoning. It never overwrites customized code silently.
 
-## Verification
+V2 includes:
 
-After implementation, the workflow:
+1. **Project Foundation · v2.0.0** — clean-project `app/core` blueprint without
+   DI/service locator. It asks for app identity, bundle/application ID, package
+   name, design/palette, locale, API configuration, and starter/showcase. It
+   cleans legacy branding, URLs, imports, SSL bypasses, old dependencies, and
+   sample domain features rather than copying the reference project literally.
+2. **Authentication & Account Management · v2.0.0** — configurable email/phone,
+   password/OTP, auth/account flows, custom fields, guest/post-registration
+   behavior, UI + Logic or Logic Only, Arabic/English and RTL/LTR. It refuses
+   replacement when an Auth/Account domain already exists.
 
-1. formats changed Dart files;
-2. runs affected project code generation;
-3. runs `flutter analyze`;
-4. exercises the affected scenario when a device or suitable runtime is
-   available;
-5. records exact results and unresolved TODOs.
+Component definitions update with the Engine, but production components change
+only through this flow and an approved plan.
 
-V1 does not generate or require unit tests or widget tests.
+### `flutter run flow:design-sync`
 
-## Update
+Normalizes a design source into
+`.specify/flutter-engine/design/design-contract.json`.
 
-Update the local workflow clone:
+Supported inputs are Figma MCP, Figma URL/node, token JSON, exported assets and
+styles, manual values, or `Not available yet`. A write lists changed tokens,
+components, consumers, theme/localization impact, and rollback in a plan.
 
-```bash
-cd flutter-workflow
-git pull
+If Figma MCP is disconnected, expired, or inaccessible, Codex explains the
+connection problem and offers reconnect/another URL, JSON, exports, manual
+values, or skip. Credentials are never stored. Missing design does not block a
+feature: explicit flow design wins, then the Design Contract, existing theme,
+and finally generic Foundation defaults for a clean project.
+
+### `flutter run flow:feature`
+
+The first question is always the feature name. The Engine then asks one relevant
+question at a time, with a dynamic remaining count, for:
+
+- business goal, user story/actor, acceptance, edges, and out of scope;
+- designs/screens/navigation/platform/responsive/accessibility behavior;
+- API documentation, request/response/errors/auth and missing-contract choices;
+- cache/storage/offline, localization, reusable components/form fields;
+- sensitive data/security and unit-testable behavior.
+
+Feature name and basic functional goal are required. `Not available yet` is a
+valid design or API answer. Missing design uses the project contract. Missing
+API never causes invented endpoints/schemas: the plan scopes UI/logic or defers
+network integration.
+
+New features follow the project-adapted Engine direction:
+
+```text
+Widget → Cubit → Repository → Network
 ```
 
-Run the installer again for each target project:
+This remains the standard even when older features use another architecture;
+missing prerequisites appear in the plan. The flow reuses current project
+capabilities first, then Flutter/Dart native behavior, installed dependencies,
+minimum owned code, and only then a new compatible dependency.
 
-```bash
-dart run install.dart --target /absolute/path/to/flutter-project
+### `flutter run flow:change`
+
+The first question is the feature/module name. Codex baselines current behavior,
+structure, callers, consumers, tests, design/API contracts, and expected delta.
+It preserves the current feature architecture and applies the smallest approved
+change. Migration to the Engine feature standard is compared separately and is
+never automatic.
+
+### `flutter run flow:bug`
+
+The first question is the feature/module name, followed by observed behavior,
+expected behavior, reproduction, environment, and sanitized evidence. Codex
+traces callers and layers until the root cause is demonstrated. Without enough
+evidence the Work Item becomes `NEEDS_EVIDENCE`; no guessed fix or plan is
+produced. Once proven, the smallest root-cause fix requires Plan Approval.
+
+### `flutter run flow:unit-test`
+
+Backfills focused unit tests for existing code without changing behavior. It
+identifies observable cases, existing test conventions, minimal fakes, files,
+and any compatible dev dependency in a plan. If testability requires a
+production seam, that exact minimal change must be approved too.
+
+Current scope covers validators/formatters/normalizers, models/JSON, params,
+pure logic, Cubit transitions, repository mapping/errors, and cache/session
+helpers. Widget, golden, and integration tests are outside V2 unless explicitly
+added later.
+
+### `flutter run flow:test`
+
+Runs existing focused tests and relevant verified project commands. It may run
+existing code generation, formatting checks, and `flutter analyze`, but it is
+read-only with respect to source/tests and has no Plan gate. It reports changed
+failures separately from pre-existing failures.
+
+### `flutter run flow:resume`
+
+Resumes the single durable Work Item; it never creates a duplicate. It restores
+the original skill/component context, answers, spec, plan, tasks, decisions,
+result, state, and valid approvals. Before continuing from `PLAN_APPROVED`,
+`IMPLEMENTING`, or `BLOCKED`, it rechecks Git/code drift. Completed `VERIFIED`
+and `CANCELLED` items are immutable.
+
+### `flutter run flow:check`
+
+Read-only health/status. It does not run analyze or create a Work Item. It shows:
+
+- Flutter validity, Spec Kit and Engine versions, installation and onboarding;
+- managed files/checksums and V1 migration state;
+- component availability/install/customization/conflicts;
+- active and resumable Work Items, last gate, drift, and next action.
+
+The final result is `READY` or `ATTENTION`.
+
+### `flutter run flow:engine-update`
+
+Checks the installed lock against a requested/released Engine version, reads its
+release notes and component changes, and writes a migration/rollback plan. After
+approval it downloads to a temporary staging directory, validates manifests,
+skills and checksums, runs the installer with explicit version-update authority,
+then verifies atomically. It preserves project profiles, specs, approvals,
+design contracts, component customizations, and production code.
+
+Re-running the one-line installer repairs the **same pinned version**. It refuses
+a version change and directs the developer to this flow.
+
+## Cross-cutting skills
+
+### Ponytail
+
+Every delivery flow searches before writing: existing project capability,
+Flutter/Dart native behavior, installed dependency, minimum feature code, then
+a justified new dependency. It rejects speculative abstractions and fixes bugs
+at the shared root cause. Engine gates, security, tests, and accessibility take
+precedence over minimality.
+
+### OWASP security
+
+OWASP impact runs inside onboarding, components, design sync, features, changes,
+and bugs—not as a separate audit. Discovery classifies auth/tokens, PII,
+storage, TLS/network, crypto, links/WebViews, permissions/biometrics, files,
+sensors, logs, payments, API and dependency surfaces. The same plan contains
+controls and verification. An introduced critical regression blocks
+`VERIFIED`; pre-existing findings are recorded without silently expanding scope.
+The Engine never claims OWASP certification or treats client checks as server
+authorization.
+
+### Unit tests
+
+Feature/change/bug/component flows automatically assess changed logic and add
+the smallest meaningful unit tests to the same plan. Trivial UI wiring records
+`UNIT_TEST_NOT_APPLICABLE`. Direct instances and simple fakes come before mocks;
+`bloc_test` is added only when Cubit state sequences justify it.
+
+### Reusable semantic form fields
+
+Any semantic field becomes central on first use under:
+
+```text
+lib/core/utils/widgets/form_fields/
+├── default_form_field.dart
+├── default_phone_form_field.dart
+├── default_email_form_field.dart
+└── default_password_form_field.dart
 ```
 
-Managed workflow files are refreshed. Project-owned constitutions, profiles,
-and work items remain unchanged.
+One field per file; no barrel. A phone field owns input/autofill, calling-code
+selection, formatting, local/E.164 normalization, validation, required/read-only
+states, localization, theme and accessibility. It does not own API calls, Cubit
+events, navigation, or business side effects. Future phone inputs reuse or
+extend it and verify existing consumers.
 
-After an update, start a new Codex task in the target project so project-local
-skills are discovered from the updated files.
+## Dependencies and Flutter versions
 
-## Maintainer check
+Component/feature work resolves the latest package versions compatible with the
+project's current Flutter/Dart SDK at apply time. A clean Foundation can select
+current compatible packages. An existing project receives only required
+dependencies—no mass upgrade, `dependency_overrides`, automatic Flutter SDK
+upgrade, or stale fixed version copied from a template. Keep `pubspec.lock`
+tracked and name code-generation commands in the approved plan.
 
-Analyze the installer and run its framework-free smoke check:
+## V1 migration
+
+Installing V2 beside a V1 `.flutter-workflow` marks `pending_plan` and does not
+delete anything. `flow:engine-update` then:
+
+1. inventories V1 constitution, profile, packs, and Work Items;
+2. writes a migration/rollback plan and waits for approval;
+3. archives source artifacts under `.specify/flutter-engine/legacy/v1`;
+4. imports facts/history, preserving previous plan approvals and recording old
+   Playback approval as history only;
+5. verifies imported data before removing `.flutter-workflow`;
+6. rolls back if verification fails.
+
+## Git and teams
+
+The Engine never changes branches, commits, pushes, or opens PRs without an
+explicit request. Commit durable Engine artifacts with production changes.
+Non-sequential Work Item IDs reduce collisions, but the active-session lock is
+local to one working copy and intentionally gitignored. Separate clones require
+normal Git/team coordination; no local file can enforce a global team lock.
+
+## Maintainer validation and release
+
+Before publishing an Engine release:
 
 ```bash
-dart analyze install.dart
-dart analyze tool/smoke.dart
+dart format --output=none --set-exit-if-changed install.dart tool/smoke.dart
 dart run tool/smoke.dart
 ```
 
-The smoke check creates temporary fixtures, verifies valid/invalid installation,
-checks reinstallation preservation, and removes its fixtures when finished.
+Validate all four skills with the official `quick_validate.py`, and validate
+the extension/workflow manifests with a compatible Spec Kit CLI. Update the
+central version in `engine.json`, `extension.yml`, both workflow manifests, and
+release notes together. Component versions remain independent. Tag the release;
+do not move an existing version tag.
 
-## Safety boundaries
+## Boundaries
 
-- No branch creation, switching, renaming, or deletion
-- No commit or push without an explicit developer request
-- No production credentials or unsanitized secrets in workflow inputs
-- No new dependency hidden outside the approved playback and plan
-- No architecture migration hidden inside a feature change or bug fix
-- No merge or overwrite of conflicting Feature Pack target directories
-- No unit/widget test requirement in V1
+V2 does not run parallel agent sessions, create Git branches/commits/pushes,
+invent API/design contracts, store Figma credentials/secrets, automatically
+upgrade Flutter, or generate widget/golden/integration tests. Project creation
+remains `flutter create`; Engine setup begins inside the created or existing
+project.

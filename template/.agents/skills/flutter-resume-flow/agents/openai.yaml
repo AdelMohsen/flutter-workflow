@@ -1,4 +1,0 @@
-interface:
-  display_name: "Flutter Resume Flow"
-  short_description: "Resume an existing Flutter workflow work item"
-  default_prompt: "Use $flutter-resume-flow to continue an existing Flutter workflow work item from its saved state."

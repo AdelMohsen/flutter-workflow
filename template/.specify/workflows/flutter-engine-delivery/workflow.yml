@@ -1,0 +1,41 @@
+schema_version: "1.0"
+workflow:
+  id: "flutter-engine-delivery"
+  name: "Flutter Engine Delivery"
+  version: "2.0.0"
+  author: "INNOVA DIGITS"
+  description: "Prepare, approve, apply, and verify a Flutter delivery plan"
+
+requires:
+  speckit_version: ">=0.9.0"
+  integrations:
+    any: [codex]
+
+inputs:
+  flow:
+    type: string
+    required: true
+    enum: [component, design-sync, feature, change, bug, unit-test, engine-update]
+  request:
+    type: string
+    required: true
+  integration:
+    type: string
+    default: "codex"
+
+steps:
+  - id: prepare
+    command: speckit.flutter-engine.prepare
+    integration: "{{ inputs.integration }}"
+    input:
+      args: "flow={{ inputs.flow }} request={{ inputs.request }}"
+  - id: approve-plan
+    type: gate
+    message: "Approve the exact Flutter Engine plan before any modification."
+    options: [approve, reject]
+    on_reject: abort
+  - id: apply
+    command: speckit.flutter-engine.apply
+    integration: "{{ inputs.integration }}"
+    input:
+      args: "flow={{ inputs.flow }} request={{ inputs.request }}"

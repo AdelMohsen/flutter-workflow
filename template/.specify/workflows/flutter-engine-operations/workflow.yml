@@ -1,0 +1,31 @@
+schema_version: "1.0"
+workflow:
+  id: "flutter-engine-operations"
+  name: "Flutter Engine Operations"
+  version: "2.0.0"
+  author: "INNOVA DIGITS"
+  description: "Run setup, onboarding, checks, tests, or resume"
+
+requires:
+  speckit_version: ">=0.9.0"
+  integrations:
+    any: [codex]
+
+inputs:
+  flow:
+    type: string
+    required: true
+    enum: [setup, onboard, test, resume, check]
+  request:
+    type: string
+    default: ""
+  integration:
+    type: string
+    default: "codex"
+
+steps:
+  - id: operate
+    command: speckit.flutter-engine.operate
+    integration: "{{ inputs.integration }}"
+    input:
+      args: "flow={{ inputs.flow }} request={{ inputs.request }}"

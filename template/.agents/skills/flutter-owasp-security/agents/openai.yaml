@@ -1,0 +1,4 @@
+interface:
+  display_name: "Flutter OWASP Security"
+  short_description: "Apply OWASP controls to Flutter changes"
+  default_prompt: "Use $flutter-owasp-security to assess and verify this Flutter change."

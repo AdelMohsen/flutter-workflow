@@ -1,0 +1,4 @@
+interface:
+  display_name: "Flutter Unit Tests"
+  short_description: "Add focused unit tests for Flutter logic"
+  default_prompt: "Use $flutter-unit-tests to cover changed Flutter behavior with focused unit tests."

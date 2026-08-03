@@ -1,4 +1,0 @@
-interface:
-  display_name: "Flutter Project Init"
-  short_description: "Inspect and initialize a Flutter project workflow"
-  default_prompt: "Use $flutter-project-init to inspect this Flutter project and establish its workflow constitution and project profile."

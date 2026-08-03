@@ -1,4 +1,0 @@
-interface:
-  display_name: "Flutter Change Feature"
-  short_description: "Safely change an existing Flutter feature"
-  default_prompt: "Use $flutter-change-feature to understand, plan, implement, and verify a change to an existing Flutter feature."

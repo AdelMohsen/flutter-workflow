@@ -1,0 +1,10 @@
+schema_version: "1.0"
+id: auth-account-v2
+name: "Authentication & Account Management"
+version: "2.0.0"
+type: feature
+status: available
+targets: [lib/features/auth, lib/features/account]
+conflict_policy: refuse_existing_domain
+reference: "../../references/components/auth-account.md"
+dependencies: compatible-current

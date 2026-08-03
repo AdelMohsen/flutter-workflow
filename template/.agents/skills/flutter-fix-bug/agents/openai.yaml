@@ -1,4 +1,0 @@
-interface:
-  display_name: "Flutter Fix Bug"
-  short_description: "Trace and fix a Flutter feature defect"
-  default_prompt: "Use $flutter-fix-bug to reproduce, trace, plan, fix, and verify a Flutter defect."
