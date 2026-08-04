@@ -1,6 +1,7 @@
 # Tasks · {{WORK_ID}}
 
 - [ ] Recheck Git/code drift against the approved plan
+- [ ] Recheck `context.md` and every missing-input fallback
 - [ ] Implement the approved smallest change
 - [ ] Add or update applicable focused unit tests
 - [ ] Run security verification for affected surfaces

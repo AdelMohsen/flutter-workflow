@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.1.0
+
+- Added read-only `flow:chat` for project/Engine Q&A, architecture explanation,
+  brainstorming, evidence-backed research, and seamless delivery-flow handoff.
+- Added grouped free-text discovery, scenario readiness, durable `context.md`,
+  and missing-input fallback/resolution tracking.
+- Added sanitized Project Foundation 2.1 source with adaptive Android/iOS UI,
+  iPad/Web width constraints, Web routing metadata, secure storage, generated
+  localization, safe tracing, central feedback/form fields, and media picking.
+- Removed creator attribution/metadata and expanded installer/README validation.
+
 ## 2.0.0
 
 - Rebuilt the workflow as a Spec Kit extension with native workflow gates and

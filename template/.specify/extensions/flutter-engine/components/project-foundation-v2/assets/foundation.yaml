@@ -1,0 +1,31 @@
+schema_version: "1.0"
+source: sanitized-blueprint
+targets: [android, ios, web]
+max_content_width: 720
+dependencies:
+  sdk: [flutter, flutter_localizations, flutter_web_plugins]
+  runtime:
+    - flutter_bloc
+    - dio
+    - go_router
+    - flutter_secure_storage
+    - google_fonts
+    - hexcolor
+    - image_picker
+    - file_picker
+    - loader_overlay
+    - toastification
+    - intl
+    - cupertino_icons
+optional_modules: [pdf, printing, open_filex, photo_view]
+forbidden_source_data:
+  - reference project names and package imports
+  - real URLs, API keys, signing files, and service configuration
+  - feature images, icons, strings, routes, and models
+verification:
+  - asset and ARB reference audit
+  - flutter gen-l10n
+  - dart format
+  - flutter analyze
+  - focused tests
+  - platform build smoke

@@ -1,0 +1,23 @@
+{
+  "@@locale": "en",
+  "appName": "Flutter App",
+  "showcaseTitle": "Component Showcase",
+  "showcaseDescription": "Adaptive, reusable project foundation",
+  "apiConfigured": "API is configured",
+  "apiNotConfigured": "API configuration is pending",
+  "enabled": "Enabled",
+  "disabled": "Disabled",
+  "routeNotFound": "Route not found",
+  "emailLabel": "Email",
+  "passwordLabel": "Password",
+  "phoneLabel": "Phone number",
+  "requiredField": "This field is required",
+  "invalidEmail": "Enter a valid email address",
+  "invalidPhone": "Enter a valid phone number",
+  "invalidPassword": "Use at least 8 characters",
+  "pickImage": "Choose image",
+  "pickFile": "Choose file",
+  "submit": "Submit",
+  "successMessage": "Action completed",
+  "errorMessage": "Something went wrong"
+}

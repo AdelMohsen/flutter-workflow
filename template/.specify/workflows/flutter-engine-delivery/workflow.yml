@@ -2,7 +2,7 @@ schema_version: "1.0"
 workflow:
   id: "flutter-engine-delivery"
   name: "Flutter Engine Delivery"
-  version: "2.0.0"
+  version: "2.1.0"
   author: "INNOVA DIGITS"
   description: "Prepare, approve, apply, and verify a Flutter delivery plan"
 

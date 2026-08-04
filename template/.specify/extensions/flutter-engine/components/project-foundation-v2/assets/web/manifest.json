@@ -1,0 +1,11 @@
+{
+  "name": "Flutter App",
+  "short_name": "Flutter App",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#1D4ED8",
+  "description": "Flutter application",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false
+}

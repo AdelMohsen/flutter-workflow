@@ -4,6 +4,7 @@ Read the shared lifecycle in `../lifecycle.md` before a mutating flow.
 
 | Chat command | Contract | Plan approval |
 | --- | --- | --- |
+| `flutter run flow:chat` | Read-only project/Engine Q&A, architecture explanation, brainstorming, comparison, and current research with evidence. | No |
 | `flutter run flow:setup` | Validate Flutter, install or repair Spec Kit/Codex integration and the pinned Engine files. Migrate no production code. | No |
 | `flutter run flow:onboard` | Discover an existing project's architecture, commands, design system, dependencies, risks, and reusable capabilities. Write the project profile and constitution. | No |
 | `flutter run flow:component` | List component status, then add, update, or repair one independently versioned component. | Yes |
@@ -32,6 +33,22 @@ Read the shared lifecycle in `../lifecycle.md` before a mutating flow.
 4. Keep the installed version pinned. Never turn repair into a silent major
    update. Finish with `READY`, or `ATTENTION` plus the exact repair command.
 
+## Chat
+
+Read only the relevant Constitution, project profile, Design Contract,
+component locks, active/history Work Items, repository files, local Git history,
+Engine references, and relevant Figma MCP context when connected. Search
+progressively instead of loading the repository.
+For current or requested research, prefer primary/official sources and provide
+links. Format material claims as `Project Fact`, `Engine Rule`,
+`External Evidence`, `Inference`, or `Recommendation`.
+
+Chat creates no Work Item, lock, plan, or files. It may coexist with an active
+mutating Work Item but never changes it. When the user requests implementation,
+route new behavior to `feature`, existing behavior to `change`, defects to
+`bug`, and Foundation/catalog work to `component`; carry the sanitized chat
+context into the new Work Item.
+
 ## Onboard
 
 Inspect entrypoints, `app/core/features` or existing equivalents, state
@@ -47,26 +64,49 @@ Show `AVAILABLE`, `INSTALLED`, `UPDATE_AVAILABLE`, `CUSTOMIZED`,
 discovery/questions contract and use baseline/project/new three-way reasoning.
 Never overwrite customized code silently.
 
-## Feature questions
+## Delivery discovery
 
-Ask one question at a time with a dynamic count. The feature name and basic
-functional goal are required. Cover only relevant unknowns:
+Discover project facts before asking. A question is material only when its
+answer changes behavior, scope, a business rule, UI state, navigation, API/data
+contract, security, persistence, compatibility, acceptance, or verification.
+Group every independent material question in one batch without a numeric cap;
+organize by Business, Scenarios, UI, Data, and Security. Ask dependent questions
+after the triggering answer. Always accept free text and partial replies; never
+repeat answered/discoverable questions.
 
-- business goal, user story, actor, acceptance, edges, and out of scope;
+The feature name and basic functional goal are required. Cover relevant gaps:
+
+- actors, triggers, business goal/rules, success outcome, and out of scope;
+- happy, negative, edge, loading, empty, error, retry, cancel, duplicate-action,
+  and partial-failure behavior when applicable;
 - designs: Figma, URL, images/files, or `Not available yet`;
 - screens, navigation, platforms, responsiveness, and accessibility;
 - APIs: OpenAPI/Swagger/Postman/docs or `Not available yet`;
 - request/response/errors/auth, cache/offline/storage, and localization;
 - reusable components/form fields, sensitive data, and unit-testable behavior.
 
-Missing design does not block: use the Design Contract or existing theme.
-Missing API does not authorize invented endpoints or schemas: scope UI/logic or
-defer network integration explicitly.
+Ask whether an API exists and accept Swagger/OpenAPI/Postman/docs, request and
+response samples, a written contract, or `Not available`. Read only relevant
+operations, authentication, parameters, status codes, and error schemas. If a
+protected URL cannot be read, request a sanitized export; never store
+credentials.
+
+Missing design uses the Design Contract, project theme, then Foundation
+defaults. Missing ordinary API input uses a typed static repository or deferred
+network implementation and is recorded in `context.md`. Never invent endpoints
+or schemas. Sensitive side effects never return fake success.
+
+Do not reach `SPEC_READY` before actors/triggers, business rules, happy/negative/
+edge scenarios, applicable UI states, navigation/exit behavior, data source,
+security/privacy, acceptance, out of scope, and missing-input fallbacks are
+explicit. `Open decisions` must be `none`.
 
 ## Change and bug
 
-For change, preserve the current feature structure unless migration is
-explicitly requested; compare the minimum delta with migration in the plan.
+For change, discover current behavior, desired delta, consumers, compatibility,
+data migration, updated scenarios, and regression checks. Preserve the current
+feature structure unless migration is explicitly requested; compare the minimum
+delta with migration in the plan.
 For bug, capture observed/expected/reproduction/environment/sanitized evidence,
 trace all callers and layers, and use `NEEDS_EVIDENCE` until root cause is
 demonstrated. Never plan a guessed fix.

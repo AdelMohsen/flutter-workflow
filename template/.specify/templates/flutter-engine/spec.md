@@ -10,22 +10,44 @@ predecessors: []
 
 # Specification
 
-## Goal and user story
+## Business context, actors, and triggers
 
-## Expected behavior and acceptance
+## Business rules
 
-## Positive, negative, and edge cases
+## Happy scenarios
+
+## Negative scenarios
+
+## Edge cases and partial failures
 
 ## UI states, accessibility, localization, and platforms
 
 ## Design and reuse decisions
 
-## API, data, storage, and offline behavior
+## Data source, API/error contract, storage, and offline behavior
 
 ## Security impact
+
+## Asset and localization impact
 
 ## Unit-test impact
 
 ## Dependencies and code generation
 
-## Out of scope and deferred inputs
+## Acceptance criteria and verification
+
+## Out of scope
+
+## Missing inputs and declared fallbacks
+
+| ID | Missing input | Why it matters | Status | Fallback | Deferred behavior | Requested source | Resolution |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+
+## Open decisions
+
+`none` is required before `SPEC_READY`.
+
+## Readiness
+
+`SPEC_READY` requires closed scenarios, a declared data source, no hidden
+assumptions, and a fallback or deferred scope for every missing input.

@@ -1,60 +1,103 @@
-# Project Foundation component
+# Project Foundation 2.1
 
-This is a blueprint derived from the cleaned reference template, not a literal
-copy. It targets a clean Flutter project and adapts to supplied design and app
-identity. Discovery must block production changes when custom Dart code or
-conflicting `lib/app`/`lib/core` already exists; use onboarding instead.
+Use the sanitized assets beside the component manifest as adaptable source, not
+as a literal project copy. Target a clean Flutter project; if custom Dart code
+or conflicting `lib/app`/`lib/core` exists, use onboarding and a Change plan.
+Never copy reference-project features, identity, URLs, keys, assets, strings,
+bundle IDs, signing files, Firebase files, or Git history.
 
-Ask one question at a time for display name, reverse-domain bundle/application
-ID, derived editable Dart package name, design source or generic palette,
-default locale (always support Arabic/English and RTL/LTR), API base URL or
-`Configure Later`, and starter screen/showcase.
+## Discovery
 
-Create only approved `lib/app` and `lib/core` capabilities used by the selected
-starter: bootstrap, routing without DI/service locator, configuration, network,
-errors/results, local storage, localization, theme/design tokens, constants,
-validators, semantic form fields, reusable UI states/components, and the
-starter screen. Remove legacy branding, URLs, package imports, SSL bypasses,
-sample domain features, and GetIt from the source concept.
+Ask only material unknowns after inspecting the project. Group independent
+questions and accept free text. Capture display name, bundle/application ID,
+derived editable package name, supported platforms, design or generic palette,
+default/supported locales, build-time flavors/base URLs or `Configure Later`,
+starter screen, and optional document/media modules.
 
-Resolve latest packages compatible with the project's current Flutter/Dart SDK
-at apply time. For an existing project, add only required dependencies; never
-mass-upgrade, add `dependency_overrides`, or upgrade Flutter automatically.
-Track `pubspec.lock`. `Configure Later` must boot safely and fail with an
-explicit configuration error before the first network request.
+Resolve latest package versions compatible with the current Flutter/Dart SDK at
+apply time. Do not mass-upgrade, add dependency overrides, or change Flutter.
+Track `pubspec.lock`. `Configure Later` must boot and fail clearly before the
+first real network request.
 
-Generic palettes when no design is available:
+## Core contract
 
-- Corporate Blue: `#1D4ED8`, `#06B6D4`
-- Emerald Teal: `#047857`, `#0D9488`
-- Indigo Violet: `#4F46E5`, `#9333EA`
-- Charcoal Orange: `#111827`, `#F97316`
+- Bootstrap, System UI, portrait orientation, and explicit initialization.
+- Immutable `AppConfig` selected from code/build `FlavorEnum`; no dart-define in
+  this version and no mutable global base URL.
+- Central `go_router` with clean Web path URLs, browser history/refresh, deep
+  links, reusable route registration, and no feature imports in core.
+- Safe Dio client with typed failures, backend-adapted `ApiErrorModel`, debug
+  tracing with redaction, and no TLS bypass, client CORS header, 401/403 cache,
+  response-body rescue, or sensitive production logs.
+- `flutter_secure_storage` for small encrypted values. Use platform defaults,
+  generic key namespaces, Android SDK 23+, Apple Keychain, and HTTPS/HSTS notes
+  for WebCrypto. Do not store long-lived Web auth secrets in Foundation.
+- Flutter `gen_l10n`, ARB, generated `AppLocalizations`, arbitrary locale count,
+  RTL/LTR, localized app title, and persisted locale.
+- Material 3 semantic tokens using `google_fonts` and `hexcolor`. Bundle the
+  selected font/license and disable runtime fetching for release.
+- Central loading/toast initialization with one solution per responsibility.
+- Validators, constants, safe debug logger, reusable UI states, and a local-only
+  Component Showcase when selected.
 
-Generate no Firebase, flavors, notifications, analytics, crash reporting,
-icons, splash automation, secrets, or sample login/home domains.
+## Adaptive and responsive UI
 
-## Reference-template adaptation map
+Use `Theme.of(context).platform`: Material behavior on Android/Web and
+Cupertino behavior on iOS/iPad for scaffold, app bar, buttons, dialogs, loader,
+switch, icons, and page transitions. Keep accessibility, focus, keyboard, and
+hover behavior.
 
-Treat these as capability groups, not files to copy blindly:
+Use one `AppContent(maxContentWidth: 720)` constraint. Phones use available
+width; iPad/Web center content with configured padding. Add no breakpoint or
+responsive dependency until a real screen needs it.
 
-| Reference group | V2 decision |
-| --- | --- |
-| `app/my_app.dart` | Keep the bootstrap responsibility; rebuild with current package name, identity, localization, responsive policy, theme, and starter route. |
-| `app/providers_list.dart` | Keep only real root Bloc providers. Do not introduce GetIt or a service locator. |
-| `core/route` | Keep centralized route names/generation when the project selects it; remove domain-specific splash imports and reuse the project's routing package if present. |
-| `core/assets` | Generate typed path constants only for assets that actually exist. Do not create speculative empty catalogs. |
-| `core/services/network` | Keep one configured Dio client only when networking is enabled. Remove global mutable headers, client-side CORS headers, verbose sensitive logging, hardcoded URL/language/token, and SSL bypasses. |
-| `core/services/api_handler` and `core/shared/entity/models` | Consolidate into the minimum typed failure/result and response mapping used by real consumers; fix legacy names/typos instead of preserving them. |
-| `core/services/cache` | Keep a small shared-preferences wrapper for non-secret settings. Use secure storage only when an approved feature needs secrets. |
-| `core/services/servies_locator` | Drop completely; V2 Foundation uses explicit construction/providers and no DI container. |
-| `core/theme` | Rebuild as Material 3 semantic tokens and light/dark themes from the Design Contract or selected palette. No project-specific colors or hardcoded widget styling. |
-| `core/utils/constant` | Keep only selected identity/config/localization/storage keys. Replace `ABWAB`, `Yelzamni`, old URLs, and duplicated string/color constants. |
-| `core/utils/extensions` and enums | Copy only extensions/enums used by generated code after verifying names and behavior. |
-| `core/shared` and `core/utils/widgets` | Adapt reusable buttons, dialogs, empty/error/loading, spacing, navigation, responsive, text, image, and animation helpers only when selected by the starter/component. Bind them to theme/localization/accessibility. |
-| `core/utils/widgets/form_fields` | Keep a small low-level `default_form_field.dart`; add semantic fields centrally on first real use. |
-| shimmer/animation/network-image packages | Reuse only when already installed or the selected showcase needs them and the approved plan proves the dependency. |
+## Forms and media
 
-Do not preserve `modules/`, sample splash/login/home behavior, `.DS_Store`, stale
-TODOs, duplicate constants, misspelled public APIs, or imports from
-`abwab_templet`. Run `flutter pub get`, applicable generation, formatting,
-focused tests, and `flutter analyze` before marking the component verified.
+Keep every semantic field in its own file under `lib/core/ui/form_fields/`.
+Each field owns decoration, input/autofill, formatting, validation, theme,
+localization, required/read-only states, and accessibility. It never owns API,
+navigation, Cubit events, or business side effects.
+
+Base media uses one reusable `MediaPickerService` with `image_picker` and
+`file_picker`, cancellation-safe results, type/size validation, and no upload
+side effects. `pdf`, `printing`, `open_filex`, and `photo_view` remain optional
+modules.
+
+## Web configuration
+
+When `web/` exists, update only sanitized identity/title/description/theme/icon
+metadata, enable clean path URLs, preserve browser back/forward and deep-link
+refresh, and document server rewrite, HTTPS/HSTS, and backend-owned CORS.
+Do not add PWA/offline/service-worker customization without a requirement.
+
+## Asset and localization hygiene
+
+Prefer Material/Cupertino icons. Copy only an asset used by generated code, give
+it one typed catalog reference, and verify that the reference and file both
+exist. Generate only ARB keys used by Foundation. Never copy empty locales or
+feature copy.
+
+For an existing project, report apparently unused assets/keys as candidates;
+never delete them automatically because dynamic lookup may exist. Every
+delivery plan records Asset and Localization Impact.
+
+`flutter analyze` does not prove asset/key usage. Verify with an explicit
+asset/ARB reference audit, `flutter gen-l10n`, formatting, `flutter analyze`,
+focused tests, and build smoke for present platforms.
+
+## Baseline dependencies
+
+Use compatible current releases only when the selected Foundation uses them:
+`flutter_bloc`, `dio`, `go_router`, `flutter_secure_storage`, `google_fonts`,
+`hexcolor`, `image_picker`, `file_picker`, one loading solution, one toast
+solution, Flutter localization, `intl`, and `cupertino_icons`.
+
+Do not include Firebase, FCM, maps/location, Pusher, WebView, analytics,
+notifications, DI/service locators, project domains, unused icon packs, legacy
+translation systems, or reference-project images/strings.
+
+## Completion
+
+After verification, finalize the project-specific Constitution and Project
+Profile from generated facts. Production changes require the exact approved
+plan. Preserve the component baseline for future three-way updates.

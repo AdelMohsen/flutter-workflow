@@ -1,0 +1,23 @@
+{
+  "@@locale": "ar",
+  "appName": "تطبيق فلاتر",
+  "showcaseTitle": "معرض المكونات",
+  "showcaseDescription": "أساس مشروع متكيف وقابل لإعادة الاستخدام",
+  "apiConfigured": "تم إعداد واجهة API",
+  "apiNotConfigured": "إعداد واجهة API مؤجل",
+  "enabled": "مفعّل",
+  "disabled": "معطّل",
+  "routeNotFound": "المسار غير موجود",
+  "emailLabel": "البريد الإلكتروني",
+  "passwordLabel": "كلمة المرور",
+  "phoneLabel": "رقم الهاتف",
+  "requiredField": "هذا الحقل مطلوب",
+  "invalidEmail": "أدخل بريدًا إلكترونيًا صحيحًا",
+  "invalidPhone": "أدخل رقم هاتف صحيحًا",
+  "invalidPassword": "استخدم 8 أحرف على الأقل",
+  "pickImage": "اختر صورة",
+  "pickFile": "اختر ملفًا",
+  "submit": "إرسال",
+  "successMessage": "تمت العملية",
+  "errorMessage": "حدث خطأ ما"
+}

@@ -3,7 +3,7 @@ schema_version: "1.0"
 extension:
   id: flutter-engine
   name: "Flutter Engine"
-  version: "2.0.0"
+  version: "2.1.0"
   description: "Spec-driven Flutter delivery workflows for Codex"
   author: "INNOVA DIGITS"
   repository: "https://github.com/AdelMohsen/flutter-workflow"
@@ -26,4 +26,4 @@ provides:
       file: commands/operate.md
       description: "Run a read-only or bootstrap Flutter Engine operation"
 
-tags: [flutter, codex, sdd, security, testing]
+tags: [flutter, codex, sdd, chat, security, testing]

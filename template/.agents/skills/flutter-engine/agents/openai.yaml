@@ -1,4 +1,4 @@
 interface:
   display_name: "Flutter Engine"
-  short_description: "Run every Flutter Engine delivery flow"
-  default_prompt: "Use $flutter-engine to run the appropriate Flutter Engine flow safely."
+  short_description: "Chat with and safely operate Flutter Engine"
+  default_prompt: "Use $flutter-engine to answer from project context or run the appropriate Flutter Engine flow safely."

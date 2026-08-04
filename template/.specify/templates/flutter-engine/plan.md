@@ -14,6 +14,8 @@ approved_by: null
 
 ## Interfaces and data flow
 
+## Happy, negative, and edge scenario coverage
+
 ## Failure behavior
 
 ## Files, layers, consumers, and platforms
@@ -25,6 +27,8 @@ approved_by: null
 ## Unit tests and verification
 
 ## Dependencies and code generation
+
+## Missing inputs, fallbacks, and deferred scope
 
 ## Migration, rollback, and pre-existing failures
 

@@ -1,6 +1,6 @@
 ---
 name: flutter-engine
-description: Operate the INNOVA DIGITS Flutter Engine and dispatch all `flutter run flow:*` chat commands for setup, onboarding, reusable components, Figma/design synchronization, new features, changes, bug fixes, unit tests, verification, resume, health checks, and Engine updates. Use whenever a developer types an Engine command, asks to build or modify Flutter code in an Engine-installed project, or needs to continue an Engine Work Item.
+description: Operate the INNOVA DIGITS Flutter Engine and dispatch all `flutter run flow:*` commands for read-only project/Engine chat and research, setup, onboarding, reusable components, Figma/design synchronization, new features, changes, bug fixes, unit tests, verification, resume, health checks, and Engine updates. Use whenever a developer asks about, brainstorms, researches, builds, or modifies an Engine-installed Flutter project, invokes an Engine command, or continues an Engine Work Item.
 ---
 
 # Flutter Engine
@@ -20,8 +20,6 @@ Treat `flutter run flow:*` as conversation intent, never a shell command.
 
    Flow        <flow label>
    Workspace   <project folder>
-
-   created by Adel Mohsen
    ```
 
 2. Read the command table in
@@ -35,11 +33,19 @@ Treat `flutter run flow:*` as conversation intent, never a shell command.
 
 ## Execute
 
-- Ask one material question at a time in the user's language; keep identifiers
-  in English. Show dynamic progress when a questionnaire has multiple steps.
+- Discover before asking. Ask only questions whose answers change behavior,
+  scope, business rules, UI states, navigation, data/API contracts, security,
+  persistence, compatibility, acceptance, or verification.
+- Group every independent material question in one clearly sectioned batch,
+  without an arbitrary count. Ask dependent follow-ups only after the answer.
+  Accept unrestricted free text; suggestions are examples, not answer limits.
 - Discover before planning. Use repository evidence, never guessed API/design
   contracts. Read relevant Work Item history and all consumers of changed shared
   behavior.
+- Create `context.md` with material answers, sanitized evidence, project facts,
+  missing inputs, declared fallbacks, and later resolutions. Do not reach
+  `SPEC_READY` until scenarios close and every missing input has a safe fallback
+  or deferred scope.
 - Write the spec and decision-complete plan. There is no Playback approval.
   Stop at `PLAN_READY` until the user explicitly approves the exact plan hash.
 - After approval, implement only the plan, verify proportionately, write
@@ -50,10 +56,24 @@ Treat `flutter run flow:*` as conversation intent, never a shell command.
 
 ## Recover
 
-`flow:resume` reads the active lock and durable Work Item. Preserve approvals
-whose plan hash still matches. Recheck Git/code drift before continuing from
+`flow:resume` reads the active lock, `context.md`, and every durable Work Item
+artifact. Preserve approvals whose plan hash still matches. Recheck Git/code drift before continuing from
 `PLAN_APPROVED`, `IMPLEMENTING`, or `BLOCKED`. Never duplicate the Work Item.
 
 `flow:check` is read-only and returns `READY` or `ATTENTION` with installed
 versions, initialization, component status, active/incomplete Work Items, last
 gate, drift, and one next action. It does not run analyze or create files.
+
+## Chat
+
+`flow:chat` is read-only and takes no session lock, Work Item, or approval. Read
+only the relevant Constitution, profile, design/component state, Work Item
+history, code, Git history, Engine references, and Figma MCP context when the
+question is design-related and the connection is available. Search locally before
+answering; use current primary sources when the user requests research or facts
+may have changed. Separate project facts, Engine rules, external evidence,
+inference, and recommendation. Cite local files and external links.
+
+Never mutate from chat. Carry the discussion into `context.md` when the user
+switches to `feature`, `change`, `bug`, or `component`, so they do not repeat
+answers. Chat may run while a mutating Work Item exists but must not alter it.

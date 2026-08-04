@@ -174,7 +174,6 @@ Map<String, String> _identity(Directory template) {
     'organization',
     'organization_label',
     'automation',
-    'creator',
     'repository',
     'spec_kit',
   ];
@@ -446,7 +445,6 @@ void _banner(Map<String, String> identity, String flow, String workspace) {
   stdout.writeln('╰$border╯\n');
   stdout.writeln('Flow        $flow');
   stdout.writeln('Workspace   $workspace\n');
-  stdout.writeln('created by ${identity['creator']}\n');
 }
 
 String? _option(List<String> args, String name) {

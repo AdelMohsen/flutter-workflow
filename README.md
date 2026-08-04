@@ -5,11 +5,9 @@ Spec-driven Flutter delivery for OpenAI Codex, owned by **INNOVA DIGITS**.
 ```text
 ╭────────────────────────────────────────────────╮
 │ INNOVA DIGITS ENGINEERING                      │
-│ Flutter Engine · v2.0.0                        │
+│ Flutter Engine · v2.1.0                        │
 │ Automation: OpenAI Codex                       │
 ╰────────────────────────────────────────────────╯
-
-created by Adel Mohsen
 ```
 
 Flutter Engine is installed inside one Flutter project. It combines GitHub
@@ -100,6 +98,7 @@ flutter-project/
 │   ├── workflows/flutter-engine-operations/
 │   ├── memory/constitution.md
 │   ├── specs/<date>-<slug>-<short-id>/
+│   │   ├── context.md
 │   │   ├── spec.md
 │   │   ├── plan.md
 │   │   ├── tasks.md
@@ -141,6 +140,12 @@ for approval. The same work redirects to resume; another flow returns
 expires the lock by age and never opens subagents, nested Codex tasks, forks, or
 parallel sessions.
 
+Every Work Item also keeps `context.md`: material free-text answers, sanitized
+evidence, discovered facts, missing inputs, declared fallbacks, deferred scope,
+and later resolutions. Active work updates the same ledger. A completed item is
+immutable; later input creates a linked Change Work Item that imports its full
+context.
+
 ## Command reference
 
 ### `flutter run flow:setup`
@@ -157,6 +162,32 @@ Use immediately after installation or when managed files are missing.
 - Never upgrades to another Engine version silently. Finish with `READY` or an
   exact `ATTENTION` action.
 
+### `flutter run flow:chat`
+
+Read-only project and Engine chat. It creates no Work Item, plan, lock, or file,
+and may run while another mutating Work Item is active.
+
+```text
+flutter run flow:chat
+اشرحلي Network flow في المشروع
+```
+
+```text
+flutter run flow:chat
+قارن أفضل offline approach للمشروع وابحث عن أحدث التوصيات
+```
+
+Chat searches only relevant Constitution/Profile/Design/Work Item/code/Git and
+Engine sources, plus Figma MCP context when the question is design-related and
+the connection is available. When research is requested or facts may have
+changed, it uses current primary sources and provides links. Answers distinguish
+project facts, Engine rules, external evidence, inference, and recommendation.
+
+Chat never implements. A request for new behavior moves to `flow:feature`, an
+existing behavior delta to `flow:change`, a defect to `flow:bug`, and Foundation
+or catalog work to `flow:component`. The discovered context is copied into the
+new Work Item so the user does not repeat it.
+
 ### `flutter run flow:onboard`
 
 Use when the project already exists and the Engine must understand it.
@@ -165,12 +196,15 @@ Use when the project already exists and the Engine must understand it.
   network/repositories/models/errors, routing, storage, localization/RTL, theme,
   assets, shared widgets/form fields, platforms, packages, code generation,
   tests, and verified project commands.
-- Writes project facts and constitution rules, not guesses.
+- Writes project facts and constitution rules, not guesses: dependency
+  direction, routing/deep links, network/error contracts, storage/log security,
+  localization/theme/assets, adaptive/responsive behavior, reusable UI/form
+  fields, platforms, code generation, tests, debt, and missing inputs.
 - Records architecture differences without stopping or forcing migration.
 - Does not change production code, create a Work Item, or require a plan.
 
-Run onboarding before modifying an established project. A clean project can
-instead add the Project Foundation component after setup.
+Run onboarding before modifying an established project. Successful Foundation
+verification performs the same finalization for a clean project.
 
 ### `flutter run flow:component`
 
@@ -181,17 +215,21 @@ AVAILABLE · INSTALLED · UPDATE_AVAILABLE · CUSTOMIZED · NEEDS_REPAIR · CONF
 ```
 
 The user selects a component and `add`, `update`, or `repair`. The Engine runs
-component-specific discovery, asks one configuration question at a time, and
-uses the installed baseline, project modifications, and new component version
-for three-way reasoning. It never overwrites customized code silently.
+component-specific discovery, groups independent material questions, accepts
+free text, and uses the installed baseline, project modifications, and new
+component version for three-way reasoning. It never overwrites customized code
+silently.
 
 V2 includes:
 
-1. **Project Foundation · v2.0.0** — clean-project `app/core` blueprint without
+1. **Project Foundation · v2.1.0** — sanitized clean-project `app/core`
+   blueprint without
    DI/service locator. It asks for app identity, bundle/application ID, package
-   name, design/palette, locale, API configuration, and starter/showcase. It
-   cleans legacy branding, URLs, imports, SSL bypasses, old dependencies, and
-   sample domain features rather than copying the reference project literally.
+   name, platforms, design/palette, locales, build API configuration, starter,
+   and optional modules. It includes adaptive Android/iOS UI, 720px iPad/Web
+   content, Web routing/metadata, secure storage, generated localization, safe
+   debug tracing, central feedback/form fields, and image/file picking. It
+   copies no reference branding, URLs, keys, features, images, icons, or strings.
 2. **Authentication & Account Management · v2.0.0** — configurable email/phone,
    password/OTP, auth/account flows, custom fields, guest/post-registration
    behavior, UI + Logic or Logic Only, Arabic/English and RTL/LTR. It refuses
@@ -217,19 +255,34 @@ and finally generic Foundation defaults for a clean project.
 
 ### `flutter run flow:feature`
 
-The first question is always the feature name. The Engine then asks one relevant
-question at a time, with a dynamic remaining count, for:
+Discovery searches the project before asking. A question is allowed only when
+its answer changes behavior, scope, business rules, UI states, navigation,
+API/data, security, persistence, compatibility, acceptance, or verification.
+Every independent material question is grouped in one sectioned batch without a
+numeric limit; dependent follow-ups wait for the triggering answer. Suggested
+answers are examples only—every question accepts unrestricted free text and
+partial replies.
 
-- business goal, user story/actor, acceptance, edges, and out of scope;
+Feature discovery closes:
+
+- actors, triggers, business goal/rules, success outcome, and out of scope;
+- happy, negative, edge, loading, empty, error, retry, cancel,
+  duplicate-action, and partial-failure scenarios when applicable;
 - designs/screens/navigation/platform/responsive/accessibility behavior;
 - API documentation, request/response/errors/auth and missing-contract choices;
 - cache/storage/offline, localization, reusable components/form fields;
-- sensitive data/security and unit-testable behavior.
+- sensitive data/security, acceptance, and verification.
 
 Feature name and basic functional goal are required. `Not available yet` is a
-valid design or API answer. Missing design uses the project contract. Missing
-API never causes invented endpoints/schemas: the plan scopes UI/logic or defers
-network integration.
+valid design or API answer. Missing design uses Design Contract, project theme,
+then Foundation defaults. Missing API never causes invented endpoints/schemas:
+use a typed static repository or defer Network integration. Auth, payment,
+account deletion, and other sensitive side effects never show fake success.
+
+API inputs may be Swagger/OpenAPI URL, Postman, docs, request/response samples,
+or a written contract. The Engine reads only relevant endpoints, auth, params,
+status codes, and error schemas. Protected sources require a sanitized export;
+credentials are never stored.
 
 New features follow the project-adapted Engine direction:
 
@@ -245,7 +298,8 @@ minimum owned code, and only then a new compatible dependency.
 ### `flutter run flow:change`
 
 The first question is the feature/module name. Codex baselines current behavior,
-structure, callers, consumers, tests, design/API contracts, and expected delta.
+desired delta, structure, callers, consumers, compatibility, migrations, tests,
+design/API contracts, updated scenarios, and regression checks.
 It preserves the current feature architecture and applies the smallest approved
 change. Migration to the Engine feature standard is compared separately and is
 never automatic.
@@ -257,6 +311,25 @@ expected behavior, reproduction, environment, and sanitized evidence. Codex
 traces callers and layers until the root cause is demonstrated. Without enough
 evidence the Work Item becomes `NEEDS_EVIDENCE`; no guessed fix or plan is
 produced. Once proven, the smallest root-cause fix requires Plan Approval.
+
+## Specification readiness and missing inputs
+
+Every mutating flow writes `context.md` and a specification containing Business
+Context, Actors/Triggers, Business Rules, Happy/Negative/Edge Scenarios, UI
+States, Data Source, API/Error Contract, Security, Asset/Localization Impact,
+Acceptance, Out of Scope, Missing Inputs, Open Decisions, and Readiness.
+
+`SPEC_READY` requires closed applicable scenarios, an explicit data source, no
+hidden assumption, and either a fallback or deferred scope for every missing
+input. `Open Decisions` must be `none`. Missing-input states are:
+
+```text
+MISSING · FALLBACK_SELECTED · DEFERRED · RESOLVED · NO_LONGER_NEEDED
+```
+
+The ledger records ID, impact, fallback, deferred behavior, requested source,
+and resolution. Later API/design/copy/assets update an active Work Item or create
+a linked Change Work Item from an immutable completed predecessor.
 
 ### `flutter run flow:unit-test`
 
@@ -280,8 +353,8 @@ failures separately from pre-existing failures.
 ### `flutter run flow:resume`
 
 Resumes the single durable Work Item; it never creates a duplicate. It restores
-the original skill/component context, answers, spec, plan, tasks, decisions,
-result, state, and valid approvals. Before continuing from `PLAN_APPROVED`,
+the original skill/component, `context.md`, missing-input ledger, spec, plan,
+tasks, decisions, result, state, and valid approvals. Before continuing from `PLAN_APPROVED`,
 `IMPLEMENTING`, or `BLOCKED`, it rechecks Git/code drift. Completed `VERIFIED`
 and `CANCELLED` items are immutable.
 
@@ -341,11 +414,13 @@ the smallest meaningful unit tests to the same plan. Trivial UI wiring records
 Any semantic field becomes central on first use under:
 
 ```text
-lib/core/utils/widgets/form_fields/
+lib/core/ui/form_fields/
 ├── default_form_field.dart
 ├── default_phone_form_field.dart
 ├── default_email_form_field.dart
-└── default_password_form_field.dart
+├── default_password_form_field.dart
+├── default_image_form_field.dart
+└── default_file_form_field.dart
 ```
 
 One field per file; no barrel. A phone field owns input/autofill, calling-code
@@ -353,6 +428,33 @@ selection, formatting, local/E.164 normalization, validation, required/read-only
 states, localization, theme and accessibility. It does not own API calls, Cubit
 events, navigation, or business side effects. Future phone inputs reuse or
 extend it and verify existing consumers.
+
+## Foundation platform, assets, and dependencies
+
+Foundation uses Material 3 on Android/Web and Cupertino behavior on iOS/iPad for
+shared scaffold, app bar, buttons, dialogs, loader, switch, icons, and page
+transitions. `AppContent(maxContentWidth: 720)` keeps phone width natural and
+centers iPad/Web content without a responsive package.
+
+When Web exists, Foundation updates sanitized `index.html`/manifest metadata,
+uses clean `go_router` paths, preserves back/forward and deep-link refresh, and
+documents deployment rewrites, HTTPS/HSTS, WebCrypto, and backend-owned CORS.
+It does not add full PWA/offline behavior or store long-lived Web auth secrets.
+
+Foundation copies no reference-project assets or translations. Prefer Material/
+Cupertino icons; every custom asset needs one used typed reference and every ARB
+key must be used by generated localization. Existing-project orphan candidates
+are reported, never deleted silently because dynamic lookup may exist.
+
+Verification is asset/ARB audit, `flutter gen-l10n`, formatting,
+`flutter analyze`, focused tests, and platform build smoke. Analyze alone cannot
+prove that an asset or translation key is used.
+
+Baseline packages are compatible-current `flutter_bloc`, `dio`, `go_router`,
+`flutter_secure_storage`, `google_fonts`, `hexcolor`, `image_picker`,
+`file_picker`, one loading solution, one toast solution, Flutter localization,
+`intl`, and `cupertino_icons`. `pdf`, `printing`, `open_filex`, and `photo_view`
+are optional modules.
 
 ## Dependencies and Flutter versions
 
@@ -389,8 +491,12 @@ normal Git/team coordination; no local file can enforce a global team lock.
 Before publishing an Engine release:
 
 ```bash
-dart format --output=none --set-exit-if-changed install.dart tool/smoke.dart
+dart format --output=none --set-exit-if-changed install.dart tool
+dart format --output=none --set-exit-if-changed \
+  template/.specify/extensions/flutter-engine/components/project-foundation-v2/assets/lib \
+  template/.specify/extensions/flutter-engine/components/project-foundation-v2/assets/test
 dart run tool/smoke.dart
+dart run tool/foundation_smoke.dart
 ```
 
 Validate all four skills with the official `quick_validate.py`, and validate

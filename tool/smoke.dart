@@ -24,10 +24,10 @@ void main() {
     final first = _install(installer, valid);
     _expect(first.exitCode == 0, first.stderr.toString());
     final output = first.stdout.toString();
-    _expect(output.contains('Flutter Engine · v2.0.0'), 'Missing V2 banner.');
+    _expect(output.contains('Flutter Engine · v2.1.0'), 'Missing V2.1 banner.');
     _expect(
-      output.contains('created by Adel Mohsen'),
-      'Missing creator footer.',
+      !output.toLowerCase().contains('created by'),
+      'Creator footer must not be rendered.',
     );
 
     const paths = [
@@ -37,7 +37,12 @@ void main() {
       '.specify/extensions/flutter-engine/references/security/owasp.md',
       '.specify/extensions/flutter-engine/references/unit-testing/unit-tests.md',
       '.specify/extensions/flutter-engine/components/project-foundation-v2/component.yml',
+      '.specify/extensions/flutter-engine/components/project-foundation-v2/assets/foundation.yaml',
+      '.specify/extensions/flutter-engine/components/project-foundation-v2/assets/lib/main.dart',
+      '.specify/extensions/flutter-engine/components/project-foundation-v2/assets/lib/core/network/api_client.dart',
+      '.specify/extensions/flutter-engine/components/project-foundation-v2/assets/lib/core/ui/app_content.dart',
       '.specify/extensions/flutter-engine/components/auth-account-v2/component.yml',
+      '.specify/templates/flutter-engine/context.md',
       '.specify/templates/flutter-engine/spec.md',
       '.specify/templates/flutter-engine/plan.md',
       '.specify/templates/flutter-engine/tasks.md',
@@ -87,7 +92,8 @@ void main() {
         _join(valid.path, '.specify/flutter-engine/engine.lock.json'),
       ).readAsStringSync(),
     );
-    _expect(lock is Map && lock['version'] == '2.0.0', 'Invalid Engine lock.');
+    _expect(lock is Map && lock['version'] == '2.1.0', 'Invalid Engine lock.');
+    _expect(!(lock as Map).containsKey('creator'), 'Creator metadata remains.');
     _expect(
       lock['managed_checksums'] is Map &&
           (lock['managed_checksums'] as Map).isNotEmpty,
@@ -123,7 +129,7 @@ void main() {
       'Spec Kit did not register both Engine workflows.',
     );
 
-    final changedLock = Map<String, dynamic>.from(lock as Map);
+    final changedLock = Map<String, dynamic>.from(lock);
     changedLock['version'] = '1.9.0';
     File(
       _join(valid.path, '.specify/flutter-engine/engine.lock.json'),
@@ -191,6 +197,7 @@ void main() {
     ).readAsStringSync();
     for (final command in [
       'flow:setup',
+      'flow:chat',
       'flow:onboard',
       'flow:component',
       'flow:design-sync',
@@ -204,6 +211,45 @@ void main() {
       'flow:engine-update',
     ]) {
       _expect(commands.contains(command), 'Command contract missing $command.');
+    }
+
+    for (final phrase in [
+      'Group every independent material question',
+      'typed static repository',
+      'Open decisions',
+      'Chat creates no Work Item',
+      'Project Fact',
+      'Figma MCP context',
+      'route new behavior to `feature`',
+    ]) {
+      _expect(commands.contains(phrase), 'Discovery contract missing: $phrase');
+    }
+
+    final contextTemplate = File(
+      _join(root.path, 'template/.specify/templates/flutter-engine/context.md'),
+    ).readAsStringSync();
+    for (final phrase in [
+      'Material questions and answers',
+      'Missing inputs ledger',
+      'FALLBACK_SELECTED',
+      'Later resolutions',
+    ]) {
+      _expect(contextTemplate.contains(phrase), 'Context missing: $phrase');
+    }
+
+    final foundation = File(
+      _join(
+        root.path,
+        'template/.specify/extensions/flutter-engine/references/components/project-foundation.md',
+      ),
+    ).readAsStringSync();
+    for (final phrase in [
+      'Adaptive and responsive UI',
+      'maxContentWidth: 720',
+      'Web configuration',
+      'Asset and localization hygiene',
+    ]) {
+      _expect(foundation.contains(phrase), 'Foundation missing: $phrase');
     }
 
     final bad = _install(installer, invalid);

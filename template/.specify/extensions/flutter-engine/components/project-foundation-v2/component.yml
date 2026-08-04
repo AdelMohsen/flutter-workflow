@@ -1,10 +1,11 @@
 schema_version: "1.0"
 id: project-foundation-v2
 name: "Project Foundation"
-version: "2.0.0"
+version: "2.1.0"
 type: foundation
 status: available
 targets: [lib/app, lib/core]
 conflict_policy: three_way_merge
 reference: "../../references/components/project-foundation.md"
+assets: "./assets"
 dependencies: compatible-current
